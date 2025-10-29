@@ -1,0 +1,221 @@
+{
+  "info": {
+    "name": "SaveIt.AI Backend API",
+    "description": "Complete API collection for testing SaveIt.AI backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Save Link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"link\",\n  \"content\": \"https://github.com\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/save",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "save"]
+        }
+      }
+    },
+    {
+      "name": "Save Note",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"note\",\n  \"content\": \"This is a sample note about JavaScript async/await patterns\",\n  \"title\": \"JavaScript Async Note\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/save",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "save"]
+        }
+      }
+    },
+    {
+      "name": "Save Code Snippet",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"code\",\n  \"content\": \"const fetchData = async () => {\\n  try {\\n    const response = await fetch('/api/data');\\n    const data = await response.json();\\n    return data;\\n  } catch (error) {\\n    console.error(error);\\n  }\\n};\",\n  \"title\": \"Async Fetch Function\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/save",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "save"]
+        }
+      }
+    },
+    {
+      "name": "Get All Items",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/items",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "items"]
+        }
+      }
+    },
+    {
+      "name": "Get Items with Filters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/items?type=link&page=1&limit=10&search=github",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "items"],
+          "query": [
+            {
+              "key": "type",
+              "value": "link"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "search",
+              "value": "github"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Single Item",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/item/:id",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "item", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "REPLACE_WITH_ITEM_ID"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Item",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"Updated description\",\n  \"tags\": [\"updated-tag\", \"new-tag\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/item/:id",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "item", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "REPLACE_WITH_ITEM_ID"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Item",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/item/:id",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "item", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "REPLACE_WITH_ITEM_ID"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Statistics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/stats",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "stats"]
+        }
+      }
+    }
+  ]
+}

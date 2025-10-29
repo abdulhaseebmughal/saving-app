@@ -1,0 +1,51 @@
+{
+  "name": "SaveIt.AI - Smart AI-Powered Saving",
+  "short_name": "SaveIt.AI",
+  "description": "Remember, organize, and learn from everything with AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Save Note",
+      "short_name": "Note",
+      "description": "Quickly save a new note",
+      "url": "/?action=note",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "View Notes",
+      "short_name": "Notes",
+      "description": "View all your notes",
+      "url": "/notes",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
