@@ -1,15 +1,20 @@
-# Ignore backend folder (deployed separately)
+# IMPORTANT: Ignore backend folder completely (it's deployed separately)
+backend
 backend/
+backend/**
 
-# Ignore local env files
+# Ignore local env files (but keep .env.example for reference)
 .env.local
 .env*.local
 
-# Ignore node_modules
+# Ignore development files
+node_modules
 node_modules/
 
 # Ignore build outputs
+.next
 .next/
+out
 out/
 
 # Ignore logs
@@ -20,7 +25,9 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Ignore IDE files
+.vscode
 .vscode/
+.idea
 .idea/
 *.swp
 *.swo
@@ -29,3 +36,7 @@ pnpm-debug.log*
 # Ignore OS files
 .DS_Store
 Thumbs.db
+
+# Ignore git
+.git
+.gitignore
