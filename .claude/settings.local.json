@@ -26,7 +26,12 @@
       "Bash(timeout 2 echo:*)",
       "Bash(git rm:*)",
       "Bash(git clean:*)",
-      "Bash(del backendnul)"
+      "Bash(del backendnul)",
+      "Bash(rm:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(pnpm add:*)"
     ],
     "deny": [],
     "ask": []
