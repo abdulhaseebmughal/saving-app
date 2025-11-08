@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const itemRoutes = require('./routes/itemRoutes');
 const noteRoutes = require('./routes/noteRoutes');
+const diaryNoteRoutes = require('./routes/diaryNoteRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +42,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api', itemRoutes);
 app.use('/api', noteRoutes);
+app.use('/api', diaryNoteRoutes);
 
 // 404 Handler
 app.use((req, res) => {
@@ -90,3 +92,4 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = app;
+

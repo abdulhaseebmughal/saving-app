@@ -10,17 +10,15 @@ router.post('/notes', async (req, res) => {
   try {
     const { text, color, position, size, attachedLinks } = req.body;
 
-    // Validation
-    if (!text || text.trim().length === 0) {
-      return res.status(400).json({ error: 'Note text is required' });
-    }
+    // Allow empty notes - users can add text later
+    // No validation needed for text
 
     // Get highest zIndex to place new note on top
     const highestNote = await Note.findOne().sort({ zIndex: -1 });
     const newZIndex = highestNote ? highestNote.zIndex + 1 : 1;
 
     const note = new Note({
-      text,
+      text: text || '', // Default to empty string
       color: color || '#fef08a',
       position: position || { x: 100, y: 100 },
       size: size || { width: 250, height: 250 },
@@ -79,7 +77,7 @@ router.get('/notes/:id', async (req, res) => {
 // @access  Public
 router.put('/notes/:id', async (req, res) => {
   try {
-    const { text, color, position, size, attachedLinks, zIndex } = req.body;
+    const { text, color, position, size, attachedLinks, zIndex, isPinned } = req.body;
 
     const note = await Note.findById(req.params.id);
 
@@ -94,6 +92,7 @@ router.put('/notes/:id', async (req, res) => {
     if (size !== undefined) note.size = size;
     if (attachedLinks !== undefined) note.attachedLinks = attachedLinks;
     if (zIndex !== undefined) note.zIndex = zIndex;
+    if (isPinned !== undefined) note.isPinned = isPinned;
 
     note.updatedAt = Date.now();
 

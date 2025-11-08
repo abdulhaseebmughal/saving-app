@@ -4,7 +4,8 @@ const NoteSchema = new mongoose.Schema({
   // Note content
   text: {
     type: String,
-    required: true,
+    required: false, // Allow empty notes - users can add text later
+    default: '',
     maxlength: 2000
   },
 
@@ -58,6 +59,12 @@ const NoteSchema = new mongoose.Schema({
   zIndex: {
     type: Number,
     default: 1
+  },
+
+  // Pin status
+  isPinned: {
+    type: Boolean,
+    default: false
   },
 
   // Timestamps

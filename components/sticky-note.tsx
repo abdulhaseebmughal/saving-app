@@ -20,6 +20,7 @@ interface StickyNoteProps {
 }
 
 const COLOR_MAP: Record<string, { bg: string; shadow: string }> = {
+  // Original colors
   '#fef08a': { bg: 'bg-yellow-200', shadow: 'shadow-yellow-300/50' },
   '#fecaca': { bg: 'bg-red-200', shadow: 'shadow-red-300/50' },
   '#bfdbfe': { bg: 'bg-blue-200', shadow: 'shadow-blue-300/50' },
@@ -28,6 +29,14 @@ const COLOR_MAP: Record<string, { bg: string; shadow: string }> = {
   '#fed7aa': { bg: 'bg-orange-200', shadow: 'shadow-orange-300/50' },
   '#fbcfe8': { bg: 'bg-pink-200', shadow: 'shadow-pink-300/50' },
   '#d1d5db': { bg: 'bg-gray-200', shadow: 'shadow-gray-300/50' },
+
+  // Special template colors
+  '#fee2e2': { bg: 'bg-red-100', shadow: 'shadow-red-200/50' },
+  '#fef9c3': { bg: 'bg-yellow-100', shadow: 'shadow-yellow-200/50' },
+  '#dbeafe': { bg: 'bg-blue-100', shadow: 'shadow-blue-200/50' },
+  '#e0e7ff': { bg: 'bg-indigo-100', shadow: 'shadow-indigo-200/50' },
+  '#f3e8ff': { bg: 'bg-purple-100', shadow: 'shadow-purple-200/50' },
+  '#d1fae5': { bg: 'bg-green-100', shadow: 'shadow-green-200/50' },
 }
 
 export function StickyNote({
@@ -131,14 +140,14 @@ export function StickyNote({
               value={localText}
               onChange={handleTextChange}
               onBlur={handleBlur}
-              className="w-full h-full resize-none bg-transparent border-none focus:outline-none focus:ring-0 text-gray-800 font-handwriting text-base"
+              className="w-full h-full resize-none bg-transparent border-none focus:outline-none focus:ring-0 text-black font-handwriting text-base placeholder:text-gray-600"
               placeholder="Write your note..."
               autoFocus
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <div
-              className="w-full h-full overflow-auto whitespace-pre-wrap break-words text-gray-800 font-handwriting text-base cursor-text"
+              className="w-full h-full overflow-auto whitespace-pre-wrap break-words text-black font-handwriting text-base cursor-text"
               onClick={() => setIsEditing(true)}
             >
               {text || "Click to add text..."}
