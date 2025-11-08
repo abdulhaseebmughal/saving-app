@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
 
-const API_BASE_URL = 'http://localhost:5000/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
 interface DiaryNote {
   _id: string

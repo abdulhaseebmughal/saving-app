@@ -1,7 +1,5 @@
-// Backend API URL
-const API_BASE_URL = typeof window !== 'undefined'
-  ? 'http://localhost:5000/api'
-  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+// Backend API URL - Use environment variable or default to production
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api';
 
 export interface SavedItem {
   id: string

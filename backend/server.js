@@ -15,10 +15,27 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Middleware - Allow both local and production frontend
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://saving-app-ador.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -63,11 +80,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
+// For Vercel serverless deployment, export the app
+// For local development, start the server
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`
+  app.listen(PORT, () => {
+    console.log(`
 ╔═══════════════════════════════════════╗
 ║     SaveIt.AI Backend Server         ║
 ╠═══════════════════════════════════════╣
@@ -75,21 +94,21 @@ app.listen(PORT, () => {
 ║  Environment: ${process.env.NODE_ENV || 'development'}           ║
 ║  API Base: http://localhost:${PORT}/api  ║
 ╚═══════════════════════════════════════╝
-  `);
-});
+    `);
+  });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Promise Rejection:', err);
-  // Close server & exit process
-  process.exit(1);
-});
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Promise Rejection:', err);
+    process.exit(1);
+  });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
-});
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
+  });
+}
 
 module.exports = app;
 
