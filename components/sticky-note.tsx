@@ -112,7 +112,7 @@ export function StickyNote({
       onMouseDown={handleMouseDown}
     >
       <div
-        ref={drag}
+        ref={drag as any}
         className={`w-full h-full ${colorClasses.bg} rounded-lg shadow-xl ${colorClasses.shadow} border-t-4 border-white/50 transform rotate-1 hover:rotate-0 transition-all duration-200 flex flex-col`}
       >
         {/* Header with drag handle */}

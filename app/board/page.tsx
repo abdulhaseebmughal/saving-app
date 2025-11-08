@@ -674,31 +674,31 @@ function WhiteboardCanvas() {
               }
 
               if (shape.type === 'rectangle') {
-                return <Rect {...commonProps} x={shape.x} y={shape.y} width={shape.width} height={shape.height} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} rotation={shape.rotation} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <Rect {...commonProps} x={shape.x} y={shape.y} width={shape.width || 0} height={shape.height || 0} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} rotation={shape.rotation || 0} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'circle') {
-                return <Circle {...commonProps} x={shape.x} y={shape.y} radius={shape.radius} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <Circle {...commonProps} x={shape.x} y={shape.y} radius={shape.radius || 0} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'triangle') {
-                return <RegularPolygon {...commonProps} x={shape.x} y={shape.y} sides={3} radius={shape.radius} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} rotation={shape.rotation} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <RegularPolygon {...commonProps} x={shape.x} y={shape.y} sides={3} radius={shape.radius || 0} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} rotation={shape.rotation || 0} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'star') {
-                return <KonvaStar {...commonProps} x={shape.x} y={shape.y} numPoints={5} innerRadius={shape.innerRadius} outerRadius={shape.outerRadius} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} rotation={shape.rotation} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <KonvaStar {...commonProps} x={shape.x} y={shape.y} numPoints={5} innerRadius={shape.innerRadius || 0} outerRadius={shape.outerRadius || 0} fill={shape.fill} stroke={shape.stroke} strokeWidth={shape.strokeWidth} rotation={shape.rotation || 0} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'line') {
-                return <Line {...commonProps} x={shape.x} y={shape.y} points={shape.points} stroke={shape.stroke} strokeWidth={shape.strokeWidth} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <Line {...commonProps} x={shape.x} y={shape.y} points={shape.points || []} stroke={shape.stroke} strokeWidth={shape.strokeWidth} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'arrow') {
-                return <Arrow {...commonProps} x={shape.x} y={shape.y} points={shape.points} stroke={shape.stroke} strokeWidth={shape.strokeWidth} pointerLength={10} pointerWidth={10} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <Arrow {...commonProps} x={shape.x} y={shape.y} points={shape.points || []} stroke={shape.stroke} strokeWidth={shape.strokeWidth} pointerLength={10} pointerWidth={10} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'pen') {
-                return <Line {...commonProps} x={shape.x} y={shape.y} points={shape.points} stroke={shape.stroke} strokeWidth={shape.strokeWidth} lineCap="round" lineJoin="round" tension={0.5} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <Line {...commonProps} x={shape.x} y={shape.y} points={shape.points || []} stroke={shape.stroke} strokeWidth={shape.strokeWidth} lineCap="round" lineJoin="round" tension={0.5} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               } else if (shape.type === 'text') {
-                return <Text {...commonProps} x={shape.x} y={shape.y} text={shape.text} fontSize={20} fill={shape.stroke} width={shape.width} scaleX={shape.scaleX} scaleY={shape.scaleY} />
+                return <Text {...commonProps} x={shape.x} y={shape.y} text={shape.text || ''} fontSize={20} fill={shape.stroke} width={shape.width || 200} scaleX={shape.scaleX || 1} scaleY={shape.scaleY || 1} />
               }
               return null
             })}
 
             {currentShape && (
               <>
-                {currentShape.type === 'rectangle' && <Rect x={currentShape.x} y={currentShape.y} width={currentShape.width} height={currentShape.height} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
-                {currentShape.type === 'circle' && <Circle x={currentShape.x} y={currentShape.y} radius={currentShape.radius} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
-                {currentShape.type === 'triangle' && <RegularPolygon x={currentShape.x} y={currentShape.y} sides={3} radius={currentShape.radius} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
-                {currentShape.type === 'star' && <KonvaStar x={currentShape.x} y={currentShape.y} numPoints={5} innerRadius={currentShape.innerRadius} outerRadius={currentShape.outerRadius} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
+                {currentShape.type === 'rectangle' && <Rect x={currentShape.x} y={currentShape.y} width={currentShape.width || 0} height={currentShape.height || 0} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
+                {currentShape.type === 'circle' && <Circle x={currentShape.x} y={currentShape.y} radius={currentShape.radius || 0} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
+                {currentShape.type === 'triangle' && <RegularPolygon x={currentShape.x} y={currentShape.y} sides={3} radius={currentShape.radius || 0} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
+                {currentShape.type === 'star' && <KonvaStar x={currentShape.x} y={currentShape.y} numPoints={5} innerRadius={currentShape.innerRadius || 0} outerRadius={currentShape.outerRadius || 0} fill={currentShape.fill} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} />}
                 {(currentShape.type === 'line' || currentShape.type === 'arrow' || currentShape.type === 'pen') && currentShape.points && (
                   <Line x={currentShape.x} y={currentShape.y} points={currentShape.points} stroke={currentShape.stroke} strokeWidth={currentShape.strokeWidth} lineCap={currentShape.type === 'pen' ? 'round' : 'butt'} lineJoin={currentShape.type === 'pen' ? 'round' : 'miter'} pointerLength={currentShape.type === 'arrow' ? 10 : 0} pointerWidth={currentShape.type === 'arrow' ? 10 : 0} tension={currentShape.type === 'pen' ? 0.5 : 0} />
                 )}
