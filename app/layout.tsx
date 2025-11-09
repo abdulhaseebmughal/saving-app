@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
-import { InstallPrompt } from "@/components/install-prompt"
 import { PWARegister } from "@/components/pwa-register"
 import { AuthProvider } from "@/contexts/auth-context"
 import { AuthGuard } from "@/components/auth-guard"
@@ -44,7 +43,6 @@ export default function RootLayout({
           <AuthGuard>
             <Navbar />
             <main className="min-h-screen bg-background">{children}</main>
-            <InstallPrompt />
           </AuthGuard>
           <Toaster />
         </AuthProvider>

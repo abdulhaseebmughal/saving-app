@@ -3,15 +3,59 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban, Upload, LogOut } from "lucide-react"
+import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban, Upload, LogOut, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
+}
 
 export function Navbar() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [isInstalled, setIsInstalled] = useState(false)
   const { logout } = useAuth()
+
+  useEffect(() => {
+    // Check if already installed
+    const checkInstalled = () => {
+      const standalone = window.matchMedia('(display-mode: standalone)').matches ||
+                        (window.navigator as any).standalone
+
+      setIsInstalled(standalone)
+    }
+
+    checkInstalled()
+
+    // Listen for beforeinstallprompt event
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setDeferredPrompt(e as BeforeInstallPromptEvent)
+    }
+
+    window.addEventListener("beforeinstallprompt", handler)
+
+    return () => window.removeEventListener("beforeinstallprompt", handler)
+  }, [])
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      alert('PWA install is not available. Please use your browser\'s install option.')
+      return
+    }
+
+    await deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null)
+      setIsInstalled(true)
+    }
+  }
 
   // Don't show navbar on login page
   if (pathname === '/login') {
@@ -65,26 +109,41 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Logout Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden md:flex h-9 w-9"
-            onClick={logout}
-            title="Logout"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Install Button - Only show if not installed and prompt available */}
+            {!isInstalled && deferredPrompt && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:flex h-9 w-9"
+                onClick={handleInstallClick}
+                title="Install App"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            )}
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden h-9 w-9"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+            {/* Logout Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:flex h-9 w-9"
+              onClick={logout}
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-9 w-9"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -116,6 +175,20 @@ export function Navbar() {
                     </Link>
                   )
                 })}
+
+                {/* Install button for mobile - Only show if not installed and prompt available */}
+                {!isInstalled && deferredPrompt && (
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      handleInstallClick()
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-muted-foreground hover:bg-secondary/50"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="text-sm">Install App</span>
+                  </button>
+                )}
 
                 {/* Logout button for mobile */}
                 <button
