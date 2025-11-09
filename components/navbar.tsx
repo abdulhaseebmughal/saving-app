@@ -3,18 +3,26 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban } from "lucide-react"
+import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban, Upload, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
 
 export function Navbar() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { logout } = useAuth()
+
+  // Don't show navbar on login page
+  if (pathname === '/login') {
+    return null
+  }
 
   const links = [
     { href: "/", label: "Dashboard", icon: Sparkles },
     { href: "/board", label: "Board", icon: Clipboard },
     { href: "/projects", label: "Projects", icon: FolderKanban },
+    { href: "/files", label: "Files", icon: Upload },
     { href: "/notes", label: "Notes", icon: FileText },
     { href: "/components", label: "Components", icon: Code },
     { href: "/settings", label: "Settings", icon: Settings },
@@ -57,6 +65,17 @@ export function Navbar() {
             </div>
           </div>
 
+          {/* Logout Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex h-9 w-9"
+            onClick={logout}
+            title="Logout"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"
@@ -97,6 +116,18 @@ export function Navbar() {
                     </Link>
                   )
                 })}
+
+                {/* Logout button for mobile */}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    logout()
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-muted-foreground hover:bg-secondary/50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="text-sm">Logout</span>
+                </button>
               </div>
             </motion.div>
           )}
