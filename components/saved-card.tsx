@@ -109,42 +109,46 @@ export function SavedCard({ item, onDelete }: SavedCardProps) {
   }
 
   return (
-    <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-      <Card className="group h-full overflow-hidden border-border bg-card transition-colors hover:border-primary/50">
-        <CardHeader className="space-y-3 pb-3">
+    <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="h-full">
+      <Card className="group h-full overflow-hidden border-border bg-card transition-colors hover:border-primary/50 flex flex-col">
+        <CardHeader className="space-y-2 sm:space-y-3 pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="rounded-md bg-primary/10 p-1.5 text-primary">{getIcon()}</div>
-              <Badge variant="secondary" className="text-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap flex-1 min-w-0">
+              <div className="rounded-md bg-primary/10 p-1 sm:p-1.5 text-primary flex-shrink-0">{getIcon()}</div>
+              <Badge variant="secondary" className="text-[10px] sm:text-xs px-1.5 sm:px-2">
                 {item.type}
               </Badge>
               {item.platform && item.type === "link" && (
-                <PlatformBadge platform={item.platform} />
+                <div className="hidden sm:block">
+                  <PlatformBadge platform={item.platform} />
+                </div>
               )}
               {item.category && item.type === "link" && (
-                <CategoryBadge category={item.category} />
+                <div className="hidden sm:block">
+                  <CategoryBadge category={item.category} />
+                </div>
               )}
             </div>
-            <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex gap-0.5 sm:gap-1 opacity-100 sm:opacity-0 transition-opacity sm:group-hover:opacity-100 flex-shrink-0">
               {isEditing ? (
                 <>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600" onClick={handleSaveEdit}>
-                    <Save className="h-3.5 w-3.5" />
+                  <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7 text-green-600 active:scale-95" onClick={handleSaveEdit}>
+                    <Save className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCancelEdit}>
-                    <X className="h-3.5 w-3.5" />
+                  <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7 active:scale-95" onClick={handleCancelEdit}>
+                    <X className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsEditing(true)}>
-                    <Edit2 className="h-3.5 w-3.5" />
+                  <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7 active:scale-95" onClick={() => setIsEditing(true)}>
+                    <Edit2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopy}>
-                    {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7 active:scale-95" onClick={handleCopy}>
+                    {copied ? <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> : <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />}
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={handleDelete}>
-                    <Trash2 className="h-3.5 w-3.5" />
+                  <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7 text-destructive active:scale-95" onClick={handleDelete}>
+                    <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </Button>
                 </>
               )}
@@ -161,33 +165,33 @@ export function SavedCard({ item, onDelete }: SavedCardProps) {
             <Input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="text-base font-semibold"
+              className="text-sm sm:text-base font-semibold h-8 sm:h-10"
               placeholder="Title"
             />
           ) : (
-            <h3 className="line-clamp-2 text-base font-semibold leading-tight text-balance">{item.title}</h3>
+            <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-tight text-balance">{item.title}</h3>
           )}
         </CardHeader>
 
-        <CardContent className="space-y-3 pb-3">
+        <CardContent className="space-y-2 sm:space-y-3 pb-2 sm:pb-3 px-3 sm:px-6 flex-1">
           {item.type === "code" || item.type === "component" ? (
-            <CodeBlock code={item.content.slice(0, 200)} maxHeight="150px" />
+            <CodeBlock code={item.content.slice(0, 200)} maxHeight="120px" />
           ) : (
-            <p className="line-clamp-3 text-sm text-muted-foreground text-pretty">{item.summary || item.content}</p>
+            <p className="line-clamp-3 text-xs sm:text-sm text-muted-foreground text-pretty">{item.summary || item.content}</p>
           )}
 
           {isEditing ? (
             <Input
               value={editTags}
               onChange={(e) => setEditTags(e.target.value)}
-              className="text-xs"
+              className="text-[10px] sm:text-xs h-7 sm:h-9"
               placeholder="Tags (comma separated)"
             />
           ) : (
             item.tags && item.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {item.tags.slice(0, 3).map((tag, i) => (
-                  <Badge key={i} variant="outline" className="text-xs">
+                  <Badge key={i} variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0">
                     {tag}
                   </Badge>
                 ))}
@@ -196,18 +200,18 @@ export function SavedCard({ item, onDelete }: SavedCardProps) {
           )}
         </CardContent>
 
-        <CardFooter className="flex items-center justify-between border-t border-border pt-3">
-          <span className="text-xs text-muted-foreground">
+        <CardFooter className="flex items-center justify-between border-t border-border pt-2 sm:pt-3 px-3 sm:px-6 pb-3">
+          <span className="text-[10px] sm:text-xs text-muted-foreground">
             {new Date(item.createdAt).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
             })}
           </span>
           {item.url && (
-            <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs" asChild>
+            <Button variant="ghost" size="sm" className="h-6 sm:h-7 gap-1 sm:gap-1.5 text-[10px] sm:text-xs px-2 sm:px-3 active:scale-95" asChild>
               <a href={item.url} target="_blank" rel="noopener noreferrer">
                 Visit
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               </a>
             </Button>
           )}
