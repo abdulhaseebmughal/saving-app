@@ -13,8 +13,18 @@ export const metadata: Metadata = {
   description: "Remember, organize, and learn from everything with AI",
   manifest: "/manifest.json",
   themeColor: "#000000",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
-    generator: 'v0.app'
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SaveIt.AI",
+  },
+  generator: 'v0.app'
 }
 
 export default function RootLayout({
