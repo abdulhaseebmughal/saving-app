@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ExternalLink, Trash2, Edit2, Move, MoreVertical, Github, Globe } from "lucide-react"
+import { ExternalLink, Trash2, Move, MoreVertical, Github, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -55,10 +55,10 @@ const TYPE_ICONS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  completed: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  archived: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  planning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  archived: 'bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400',
+  planning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
 }
 
 export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate }: ProjectCardProps) {
@@ -68,27 +68,24 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      exit={{ opacity: 0, scale: 0.95 }}
       className="group"
     >
-      <div
-        className="h-full p-4 sm:p-5 rounded-xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all hover:shadow-lg"
-        style={{ borderTopColor: project.color, borderTopWidth: '4px' }}
-      >
+      <div className="h-full p-5 rounded-lg border border-border bg-card hover:border-muted-foreground transition-all hover:shadow-md">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="text-2xl flex-shrink-0">{project.icon || typeIcon}</span>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">
+              <h3 className="font-semibold text-base text-foreground truncate">
                 {project.name}
               </h3>
               {project.organization && (
-                <div className="flex items-center gap-1 mt-0.5">
+                <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs">{project.organization.icon}</span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                  <span className="text-xs text-muted-foreground truncate">
                     {project.organization.name}
                   </span>
                 </div>
@@ -101,23 +98,18 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
               >
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem
-                onClick={() => setShowMoveMenu(true)}
-              >
+              <DropdownMenuItem onClick={() => setShowMoveMenu(true)}>
                 <Move className="w-4 h-4 mr-2" />
                 Move to...
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={onDelete}
-                className="text-red-600 dark:text-red-400"
-              >
+              <DropdownMenuItem onClick={onDelete} className="text-destructive">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -127,7 +119,7 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
 
         {/* Description */}
         {project.description && (
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {project.description}
           </p>
         )}
@@ -138,17 +130,14 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
             {project.tags.slice(0, 3).map((tag, i) => (
               <Badge
                 key={i}
-                variant="outline"
-                className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0"
+                variant="secondary"
+                className="text-xs px-2 py-0"
               >
                 {tag}
               </Badge>
             ))}
             {project.tags.length > 3 && (
-              <Badge
-                variant="outline"
-                className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0"
-              >
+              <Badge variant="secondary" className="text-xs px-2 py-0">
                 +{project.tags.length - 3}
               </Badge>
             )}
@@ -156,12 +145,12 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
           <div className="flex items-center gap-1.5">
-            <Badge className={`text-[10px] px-1.5 py-0 ${STATUS_COLORS[project.status]}`}>
+            <Badge className={`text-xs px-2 py-0.5 ${STATUS_COLORS[project.status]}`}>
               {project.status}
             </Badge>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+            <Badge variant="outline" className="text-xs px-2 py-0.5">
               {project.type}
             </Badge>
           </div>
@@ -171,11 +160,11 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8"
                 asChild
               >
                 <a href={project.repository} target="_blank" rel="noopener noreferrer">
-                  <Github className="w-3.5 h-3.5" />
+                  <Github className="w-4 h-4" />
                 </a>
               </Button>
             )}
@@ -183,11 +172,11 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8"
                 asChild
               >
                 <a href={project.url} target="_blank" rel="noopener noreferrer">
-                  <Globe className="w-3.5 h-3.5" />
+                  <Globe className="w-4 h-4" />
                 </a>
               </Button>
             )}
@@ -196,36 +185,38 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
 
         {/* Move Menu */}
         {showMoveMenu && (
-          <div className="absolute inset-0 bg-white dark:bg-gray-900 rounded-xl p-4 z-10 border-2 border-indigo-500">
+          <div className="absolute inset-0 bg-background rounded-lg p-4 z-10 border-2 border-primary shadow-xl">
             <div className="mb-3">
               <h4 className="font-semibold text-sm mb-2">Move to organization:</h4>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start mb-2"
-                onClick={() => {
-                  onMove(project._id, null)
-                  setShowMoveMenu(false)
-                }}
-              >
-                <span className="mr-2">📦</span>
-                No Organization
-              </Button>
-              {organizations.map((org) => (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
                 <Button
-                  key={org._id}
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start mb-2"
+                  className="w-full justify-start"
                   onClick={() => {
-                    onMove(project._id, org._id)
+                    onMove(project._id, null)
                     setShowMoveMenu(false)
                   }}
                 >
-                  <span className="mr-2">{org.icon}</span>
-                  {org.name}
+                  <span className="mr-2">📦</span>
+                  No Organization
                 </Button>
-              ))}
+                {organizations.map((org) => (
+                  <Button
+                    key={org._id}
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      onMove(project._id, org._id)
+                      setShowMoveMenu(false)
+                    }}
+                  >
+                    <span className="mr-2">{org.icon}</span>
+                    {org.name}
+                  </Button>
+                ))}
+              </div>
             </div>
             <Button
               variant="ghost"

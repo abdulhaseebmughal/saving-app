@@ -30,18 +30,17 @@ export function OrganizationCard({ organization, isSelected, onSelect, onDelete 
     >
       <button
         onClick={onSelect}
-        className={`w-full p-3 sm:p-4 rounded-xl border-2 transition-all text-left ${
+        className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
           isSelected
-            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950'
-            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+            ? 'border-primary bg-accent'
+            : 'border-border hover:border-muted-foreground'
         }`}
-        style={{ borderTopColor: organization.color, borderTopWidth: '4px' }}
       >
         <div className="text-2xl mb-2">{organization.icon}</div>
-        <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
+        <div className="text-sm font-medium text-foreground truncate">
           {organization.name}
         </div>
-        <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+        <div className="text-xs text-muted-foreground">
           {organization.projectCount} {organization.projectCount === 1 ? 'project' : 'projects'}
         </div>
       </button>
@@ -49,13 +48,13 @@ export function OrganizationCard({ organization, isSelected, onSelect, onDelete 
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10 hover:text-red-600"
+        className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive"
         onClick={(e) => {
           e.stopPropagation()
           onDelete()
         }}
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        <Trash2 className="w-4 h-4" />
       </Button>
     </motion.div>
   )

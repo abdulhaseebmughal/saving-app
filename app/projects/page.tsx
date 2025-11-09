@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Plus, Folder, FolderOpen, Trash2, Edit2, Move, Search, Filter, Grid3x3 } from "lucide-react"
+import { Plus, Folder, FolderOpen, Trash2, Search, Grid3x3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -150,7 +150,7 @@ export default function ProjectsPage() {
       }
       fetchProjects()
       toast({
-        title: "✅ Deleted",
+        title: "Deleted",
         description: "Organization removed"
       })
     } catch (error) {
@@ -168,9 +168,9 @@ export default function ProjectsPage() {
         method: 'DELETE'
       })
       setProjects(projects.filter(p => p._id !== id))
-      fetchOrganizations() // Update counts
+      fetchOrganizations()
       toast({
-        title: "🗑️ Deleted",
+        title: "Deleted",
         description: "Project removed"
       })
     } catch (error) {
@@ -195,7 +195,7 @@ export default function ProjectsPage() {
         fetchProjects()
         fetchOrganizations()
         toast({
-          title: "✅ Moved",
+          title: "Moved",
           description: "Project moved successfully"
         })
       }
@@ -208,78 +208,78 @@ export default function ProjectsPage() {
     }
   }
 
+  const organizeGrid = () => {
+    toast({
+      title: "Organized",
+      description: "Projects arranged"
+    })
+  }
+
   const PROJECT_TYPES = [
-    { value: '', label: 'All Types', icon: '📦' },
-    { value: 'vanilla', label: 'Vanilla JS', icon: '🟨' },
+    { value: '', label: 'All', icon: '📦' },
+    { value: 'vanilla', label: 'Vanilla', icon: '🟨' },
     { value: 'react', label: 'React', icon: '⚛️' },
     { value: 'nextjs', label: 'Next.js', icon: '▲' },
     { value: 'vue', label: 'Vue', icon: '💚' },
-    { value: 'angular', label: 'Angular', icon: '🅰️' },
-    { value: 'node', label: 'Node.js', icon: '🟢' },
+    { value: 'node', label: 'Node', icon: '🟢' },
     { value: 'python', label: 'Python', icon: '🐍' },
-    { value: 'other', label: 'Other', icon: '📁' },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
-                <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
-                  Project Manager
-                </h1>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                  {organizations.length} organizations • {projects.length} projects
-                </p>
-              </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                Projects
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {organizations.length} organizations • {projects.length} projects
+              </p>
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2">
               <Button
                 onClick={() => setShowCreateOrganization(true)}
                 variant="outline"
-                className="h-8 sm:h-9 px-2.5 sm:px-3 text-xs sm:text-sm active:scale-95"
+                className="h-9 px-3 text-sm"
               >
-                <Folder className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1.5" />
+                <Folder className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">New Org</span>
               </Button>
               <Button
                 onClick={() => setShowCreateProject(true)}
-                className="h-8 sm:h-9 px-2.5 sm:px-3 text-xs sm:text-sm bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95"
+                className="h-9 px-3 text-sm"
               >
-                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1.5" />
+                <Plus className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">New Project</span>
               </Button>
             </div>
           </div>
 
           {/* Search and Filters */}
-          <div className="mt-3 flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 h-8 text-xs bg-white/50 dark:bg-gray-800/50"
+                className="pl-9 h-10"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {PROJECT_TYPES.slice(0, 5).map((type) => (
+              {PROJECT_TYPES.map((type) => (
                 <button
                   key={type.value}
                   onClick={() => setTypeFilter(type.value)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap border ${
                     typeFilter === type.value
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
                   <span>{type.icon}</span>
@@ -289,28 +289,25 @@ export default function ProjectsPage() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
         {/* Organizations */}
         {organizations.length > 0 && (
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Organizations
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               <button
                 onClick={() => setSelectedOrganization(null)}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
+                className={`p-4 rounded-lg border-2 transition-all ${
                   selectedOrganization === null
-                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'border-primary bg-accent'
+                    : 'border-border hover:border-muted-foreground'
                 }`}
               >
                 <div className="text-2xl mb-2">📦</div>
-                <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">All Projects</div>
-                <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">{projects.length}</div>
+                <div className="text-sm font-medium text-foreground">All Projects</div>
+                <div className="text-xs text-muted-foreground">{projects.length}</div>
               </button>
 
               <AnimatePresence>
@@ -330,38 +327,38 @@ export default function ProjectsPage() {
 
         {/* Projects */}
         <div>
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-foreground">
               {selectedOrganization
                 ? organizations.find(o => o._id === selectedOrganization)?.name
                 : 'All Projects'}
-              <span className="ml-2 text-xs sm:text-sm font-normal text-gray-600 dark:text-gray-400">
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
                 ({filteredProjects.length})
               </span>
             </h2>
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-12 sm:py-20">
+            <div className="flex items-center justify-center py-20">
               <div className="text-center space-y-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Loading projects...</p>
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-sm text-muted-foreground">Loading projects...</p>
               </div>
             </div>
           ) : filteredProjects.length === 0 ? (
-            <div className="flex items-center justify-center py-12 sm:py-20">
+            <div className="flex items-center justify-center py-20 border-2 border-dashed border-border rounded-lg">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center space-y-3 sm:space-y-4 max-w-md"
+                className="text-center space-y-4 max-w-md px-4"
               >
-                <div className="text-5xl sm:text-6xl md:text-7xl">
+                <div className="text-6xl">
                   {searchQuery ? "🔍" : "📁"}
                 </div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold text-foreground">
                   {searchQuery ? "No projects found" : "No projects yet"}
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   {searchQuery
                     ? `No projects match "${searchQuery}"`
                     : "Create your first project to get started!"}
@@ -369,7 +366,7 @@ export default function ProjectsPage() {
                 {!searchQuery && (
                   <Button
                     onClick={() => setShowCreateProject(true)}
-                    className="mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                    className="mt-4"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Create First Project
@@ -378,7 +375,7 @@ export default function ProjectsPage() {
               </motion.div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence>
                 {filteredProjects.map((project) => (
                   <ProjectCard

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X } from "lucide-react"
+import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 
@@ -14,6 +14,7 @@ export function Navbar() {
   const links = [
     { href: "/", label: "Dashboard", icon: Sparkles },
     { href: "/board", label: "Board", icon: Clipboard },
+    { href: "/projects", label: "Projects", icon: FolderKanban },
     { href: "/notes", label: "Notes", icon: FileText },
     { href: "/components", label: "Components", icon: Code },
     { href: "/settings", label: "Settings", icon: Settings },
