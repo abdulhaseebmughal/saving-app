@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
 import { InstallPrompt } from "@/components/install-prompt"
+import { PWARegister } from "@/components/pwa-register"
 import { AuthProvider } from "@/contexts/auth-context"
 import { AuthGuard } from "@/components/auth-guard"
 import { Toaster } from "@/components/ui/toaster"
@@ -38,6 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
+        <PWARegister />
         <AuthProvider>
           <AuthGuard>
             <Navbar />
