@@ -243,10 +243,11 @@ function WhiteboardCanvas() {
   const fetchNotes = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/notes`)
-      const data = await response.json()
-      setNotes(data)
+      const result = await response.json()
+      setNotes(result.success ? result.data : [])
     } catch (error) {
       console.error('Error:', error)
+      setNotes([])
     }
   }, [])
 
@@ -301,7 +302,8 @@ function WhiteboardCanvas() {
         })
       })
       if (!response.ok) throw new Error('Failed')
-      const newNote = await response.json()
+      const result = await response.json()
+      const newNote = result.success ? result.data : result
       setNotes([...notes, newNote])
       setShowNoteMenu(false)
       toast({
@@ -463,7 +465,8 @@ function WhiteboardCanvas() {
         body: JSON.stringify(updates)
       })
       if (!response.ok) throw new Error('Failed')
-      const updatedNote = await response.json()
+      const result = await response.json()
+      const updatedNote = result.success ? result.data : result
       setNotes(notes.map(note => note._id === id ? updatedNote : note))
     } catch (error) {
       console.error('Error:', error)
@@ -482,7 +485,8 @@ function WhiteboardCanvas() {
   const bringToFront = async (id: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/notes/${id}/bring-to-front`, { method: 'PUT' })
-      const updatedNote = await response.json()
+      const result = await response.json()
+      const updatedNote = result.success ? result.data : result
       setNotes(notes.map(note => note._id === id ? updatedNote : note))
     } catch (error) {
       console.error('Error:', error)
