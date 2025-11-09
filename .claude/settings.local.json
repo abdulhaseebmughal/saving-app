@@ -33,7 +33,8 @@
       "Bash(npx tsc --noEmit)",
       "Bash(pnpm add:*)",
       "Bash(cat:*)",
-      "Bash(.gitignore)"
+      "Bash(.gitignore)",
+      "Bash(python -m json.tool:*)"
     ],
     "deny": [],
     "ask": []

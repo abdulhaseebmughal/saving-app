@@ -12,8 +12,12 @@ dotenv.config();
 // Initialize Express app
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (async for serverless compatibility)
+// Connection will be established on first request in production
+connectDB().catch(err => {
+  console.error('Initial MongoDB connection failed:', err.message);
+  // Don't crash the app, let routes handle connection errors
+});
 
 // Middleware - Allow both local and production frontend
 const allowedOrigins = [
@@ -41,6 +45,17 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Ensure MongoDB connection before each request (for serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    next(); // Continue even if DB connection fails, let routes handle it
+  }
+});
+
 // Logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -49,10 +64,30 @@ app.use((req, res, next) => {
 
 // Health check route
 app.get('/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const dbStatus = mongoose.connection.readyState;
+  const dbStates = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    mongodb: {
+      status: dbStates[dbStatus] || 'unknown',
+      configured: !!process.env.MONGO_URI
+    },
+    gemini: {
+      configured: !!process.env.GEMINI_API_KEY
+    },
+    message: !process.env.MONGO_URI ?
+      '⚠️ Please add MONGO_URI environment variable in Vercel Dashboard' :
+      '✅ All systems configured'
   });
 });
 
