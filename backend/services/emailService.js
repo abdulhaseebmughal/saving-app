@@ -1,13 +1,28 @@
 const nodemailer = require('nodemailer');
 
-// Create transporter with Gmail
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'abdulhaseebmughal2006@gmail.com',
-    pass: process.env.EMAIL_PASSWORD // App password from Gmail
+// Create transporter lazily to avoid initialization errors
+let transporter = null;
+
+const getTransporter = () => {
+  if (!transporter) {
+    const emailUser = process.env.EMAIL_USER || 'abdulhaseebmughal2006@gmail.com';
+    const emailPass = process.env.EMAIL_PASSWORD;
+
+    if (!emailPass) {
+      console.warn('EMAIL_PASSWORD not configured - email notifications disabled');
+      return null;
+    }
+
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    });
   }
-});
+  return transporter;
+};
 
 // Get device information from user agent
 const getDeviceInfo = (userAgent) => {
@@ -251,7 +266,14 @@ If this wasn't you, ignore this email and the login will be rejected.
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const emailTransporter = getTransporter();
+
+    if (!emailTransporter) {
+      console.warn('Email transporter not available - skipping email');
+      return { success: false, error: 'Email not configured' };
+    }
+
+    const info = await emailTransporter.sendMail(mailOptions);
     console.log('Login confirmation email sent:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
