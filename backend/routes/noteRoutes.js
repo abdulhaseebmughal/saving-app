@@ -31,7 +31,10 @@ router.post('/notes', async (req, res) => {
     // Populate attached links if any
     await note.populate('attachedLinks');
 
-    res.status(201).json(note);
+    res.status(201).json({
+      success: true,
+      data: note
+    });
   } catch (error) {
     console.error('Error creating note:', error);
     res.status(500).json({ error: 'Failed to create note', details: error.message });
@@ -47,7 +50,10 @@ router.get('/notes', async (req, res) => {
       .populate('attachedLinks')
       .sort({ zIndex: 1 }); // Lower zIndex first (bottom to top)
 
-    res.json(notes);
+    res.json({
+      success: true,
+      data: notes
+    });
   } catch (error) {
     console.error('Error fetching notes:', error);
     res.status(500).json({ error: 'Failed to fetch notes', details: error.message });
@@ -62,10 +68,16 @@ router.get('/notes/:id', async (req, res) => {
     const note = await Note.findById(req.params.id).populate('attachedLinks');
 
     if (!note) {
-      return res.status(404).json({ error: 'Note not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Note not found'
+      });
     }
 
-    res.json(note);
+    res.json({
+      success: true,
+      data: note
+    });
   } catch (error) {
     console.error('Error fetching note:', error);
     res.status(500).json({ error: 'Failed to fetch note', details: error.message });
@@ -99,7 +111,10 @@ router.put('/notes/:id', async (req, res) => {
     await note.save();
     await note.populate('attachedLinks');
 
-    res.json(note);
+    res.json({
+      success: true,
+      data: note
+    });
   } catch (error) {
     console.error('Error updating note:', error);
     res.status(500).json({ error: 'Failed to update note', details: error.message });
@@ -114,7 +129,10 @@ router.put('/notes/:id/position', async (req, res) => {
     const { x, y } = req.body;
 
     if (x === undefined || y === undefined) {
-      return res.status(400).json({ error: 'Position x and y are required' });
+      return res.status(400).json({
+        success: false,
+        error: 'Position x and y are required'
+      });
     }
 
     const note = await Note.findByIdAndUpdate(
@@ -127,10 +145,16 @@ router.put('/notes/:id/position', async (req, res) => {
     );
 
     if (!note) {
-      return res.status(404).json({ error: 'Note not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Note not found'
+      });
     }
 
-    res.json(note);
+    res.json({
+      success: true,
+      data: note
+    });
   } catch (error) {
     console.error('Error updating note position:', error);
     res.status(500).json({ error: 'Failed to update position', details: error.message });
@@ -152,10 +176,16 @@ router.put('/notes/:id/bring-to-front', async (req, res) => {
     ).populate('attachedLinks');
 
     if (!note) {
-      return res.status(404).json({ error: 'Note not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Note not found'
+      });
     }
 
-    res.json(note);
+    res.json({
+      success: true,
+      data: note
+    });
   } catch (error) {
     console.error('Error bringing note to front:', error);
     res.status(500).json({ error: 'Failed to update zIndex', details: error.message });
@@ -175,7 +205,11 @@ router.delete('/notes/:id', async (req, res) => {
 
     await note.deleteOne();
 
-    res.json({ message: 'Note deleted successfully', id: req.params.id });
+    res.json({
+      success: true,
+      message: 'Note deleted successfully',
+      id: req.params.id
+    });
   } catch (error) {
     console.error('Error deleting note:', error);
     res.status(500).json({ error: 'Failed to delete note', details: error.message });
@@ -188,7 +222,11 @@ router.delete('/notes/:id', async (req, res) => {
 router.delete('/notes', async (req, res) => {
   try {
     const result = await Note.deleteMany({});
-    res.json({ message: 'All notes deleted successfully', count: result.deletedCount });
+    res.json({
+      success: true,
+      message: 'All notes deleted successfully',
+      count: result.deletedCount
+    });
   } catch (error) {
     console.error('Error deleting all notes:', error);
     res.status(500).json({ error: 'Failed to delete notes', details: error.message });

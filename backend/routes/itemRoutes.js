@@ -7,6 +7,45 @@ const Item = require('../models/Item');
 const { generateLinkMetadata, generateSummary, extractDomain, detectPlatform, detectCategory } = require('../utils/gemini');
 
 /**
+ * @route   GET /api
+ * @desc    API Base route - Status check
+ * @access  Public
+ */
+router.get('/', async (req, res) => {
+  try {
+    const totalItems = await Item.countDocuments();
+    res.json({
+      success: true,
+      message: 'SaveIt.AI API is running',
+      version: '1.0.0',
+      endpoints: {
+        save: 'POST /api/save',
+        getAll: 'GET /api/items',
+        getOne: 'GET /api/item/:id',
+        update: 'PUT /api/item/:id',
+        delete: 'DELETE /api/item/:id',
+        stats: 'GET /api/stats'
+      },
+      totalItems
+    });
+  } catch (err) {
+    res.json({
+      success: true,
+      message: 'SaveIt.AI API is running',
+      version: '1.0.0',
+      endpoints: {
+        save: 'POST /api/save',
+        getAll: 'GET /api/items',
+        getOne: 'GET /api/item/:id',
+        update: 'PUT /api/item/:id',
+        delete: 'DELETE /api/item/:id',
+        stats: 'GET /api/stats'
+      }
+    });
+  }
+});
+
+/**
  * @route   POST /api/save
  * @desc    Save new item (link, note, code, or component)
  * @access  Public
