@@ -18,6 +18,11 @@ const fileItemSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  category: {
+    type: String,
+    enum: ['code', 'pdf', 'document', 'spreadsheet', 'presentation', 'image', 'video', 'audio', 'archive', 'text', 'other'],
+    default: 'other'
+  },
   industry: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Industry',

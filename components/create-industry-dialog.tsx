@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -107,6 +107,9 @@ export function CreateIndustryDialog({ open, onClose, onSuccess }: CreateIndustr
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create New Industry</DialogTitle>
+          <DialogDescription>
+            Create a new industry category to organize your files
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Upload, FolderOpen, File, Trash2, Search, Plus, X, Download, Eye } from "lucide-react"
+import { Upload, FolderOpen, File, Trash2, Search, Plus, X, Download, Eye, FileText, FileCode, FileImage, FileVideo, FileAudio, FileArchive, FileSpreadsheet, Presentation } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -25,6 +25,7 @@ interface FileItem {
   path: string
   size: number
   type: string
+  category: string
   industry?: {
     _id: string
     name: string
@@ -161,8 +162,12 @@ export default function FilesPage() {
       })
       formData.append('industry', selectedIndustry)
 
+      const token = localStorage.getItem('saveit_token')
       const response = await fetch(`${API_BASE_URL}/files/upload`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData
       })
 
@@ -257,14 +262,43 @@ export default function FilesPage() {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
   }
 
-  const getFileIcon = (type: string) => {
-    if (type.startsWith('image/')) return '🖼️'
-    if (type.startsWith('video/')) return '🎬'
-    if (type.startsWith('audio/')) return '🎵'
-    if (type.includes('pdf')) return '📄'
-    if (type.includes('zip') || type.includes('rar')) return '📦'
-    if (type.includes('text')) return '📝'
-    return '📄'
+  const getFileIcon = (category: string) => {
+    const iconProps = { className: "w-5 h-5" }
+    switch (category) {
+      case 'code': return <FileCode {...iconProps} />
+      case 'pdf': return <FileText {...iconProps} />
+      case 'document': return <FileText {...iconProps} />
+      case 'spreadsheet': return <FileSpreadsheet {...iconProps} />
+      case 'presentation': return <Presentation {...iconProps} />
+      case 'image': return <FileImage {...iconProps} />
+      case 'video': return <FileVideo {...iconProps} />
+      case 'audio': return <FileAudio {...iconProps} />
+      case 'archive': return <FileArchive {...iconProps} />
+      case 'text': return <FileText {...iconProps} />
+      default: return <File {...iconProps} />
+    }
+  }
+
+  const getCategoryBadge = (category: string) => {
+    const badgeColors: Record<string, string> = {
+      code: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+      pdf: 'bg-red-500/10 text-red-500 border-red-500/20',
+      document: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+      spreadsheet: 'bg-green-500/10 text-green-500 border-green-500/20',
+      presentation: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+      image: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+      video: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
+      audio: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
+      archive: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+      text: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+      other: 'bg-muted text-muted-foreground border-border'
+    }
+
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${badgeColors[category] || badgeColors.other}`}>
+        {category}
+      </span>
+    )
   }
 
   return (
@@ -462,7 +496,7 @@ export default function FilesPage() {
                     <div className="p-4 rounded-lg border border-border bg-card hover:border-muted-foreground transition-all hover:shadow-md">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="text-2xl">{getFileIcon(file.type)}</span>
+                          <div className="text-muted-foreground">{getFileIcon(file.category || 'other')}</div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-medium text-sm text-foreground truncate">
                               {file.name}
@@ -483,12 +517,15 @@ export default function FilesPage() {
                         </Button>
                       </div>
 
-                      {file.industry && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <span>{file.industry.icon}</span>
-                          <span>{file.industry.name}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {getCategoryBadge(file.category || 'other')}
+                        {file.industry && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground border border-border">
+                            <span>{file.industry.icon}</span>
+                            <span>{file.industry.name}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 ))}
