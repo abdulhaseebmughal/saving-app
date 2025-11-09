@@ -68,6 +68,8 @@ export async function saveItem(item: Omit<SavedItem, "id" | "createdAt">): Promi
       createdAt: result.data.createdAt,
       updatedAt: result.data.updatedAt,
       url: result.data.type === 'link' ? result.data.content : undefined,
+      platform: result.data.platform,
+      category: result.data.category,
     }
   } catch (error) {
     console.error("Error saving item:", error)
@@ -107,6 +109,8 @@ export async function fetchItems(): Promise<SavedItem[]> {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       url: item.type === 'link' ? item.content : undefined,
+      platform: item.platform,
+      category: item.category,
     }))
   } catch (error) {
     console.error("Error fetching items:", error)
