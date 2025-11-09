@@ -43,8 +43,8 @@ export default function NotesPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/diary-notes`)
       if (response.ok) {
-        const data = await response.json()
-        setNotes(data)
+        const result = await response.json()
+        setNotes(result.success ? result.data : [])
       }
     } catch (error) {
       console.error('Error fetching notes:', error)
@@ -64,7 +64,8 @@ export default function NotesPage() {
         })
       })
       if (response.ok) {
-        const newNote = await response.json()
+        const result = await response.json()
+        const newNote = result.success ? result.data : result
         setNotes([newNote, ...notes])
         setEditingNote(newNote._id)
         toast({ title: "Note created!" })
@@ -82,7 +83,8 @@ export default function NotesPage() {
         body: JSON.stringify(updates)
       })
       if (response.ok) {
-        const updatedNote = await response.json()
+        const result = await response.json()
+        const updatedNote = result.success ? result.data : result
         setNotes(notes.map(note => note._id === id ? updatedNote : note))
       }
     } catch (error) {
