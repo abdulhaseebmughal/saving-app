@@ -3,14 +3,13 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Sparkles, Lock, User } from "lucide-react"
+import { Sparkles, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { login, user } = useAuth()
@@ -27,10 +26,10 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!username.trim() || !password.trim()) {
+    if (!password.trim()) {
       toast({
         title: "Error",
-        description: "Please enter username and password",
+        description: "Please enter password",
         variant: "destructive"
       })
       return
@@ -39,7 +38,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login(username.trim(), password)
+      await login("user", password)
       toast({
         title: "Welcome!",
         description: "Successfully logged in"
@@ -47,7 +46,7 @@ export default function LoginPage() {
     } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials",
+        description: error.message || "Invalid password",
         variant: "destructive"
       })
     } finally {
@@ -78,30 +77,12 @@ export default function LoginPage() {
           <div className="text-center mb-6">
             <h2 className="text-2xl font-semibold text-foreground mb-2">Welcome Back</h2>
             <p className="text-sm text-muted-foreground">
-              Enter your credentials to access your account
+              Enter your password to access your account
             </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-foreground mb-2">
-                Username
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="pl-10"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                 Password
@@ -116,6 +97,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
                   disabled={isLoading}
+                  autoFocus
                 />
               </div>
             </div>
