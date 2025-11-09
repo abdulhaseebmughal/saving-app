@@ -5,6 +5,8 @@ const connectDB = require('./config/db');
 const itemRoutes = require('./routes/itemRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const diaryNoteRoutes = require('./routes/diaryNoteRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const organizationRoutes = require('./routes/organizationRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -101,6 +103,8 @@ app.get('/health', (req, res) => {
 app.use('/api', itemRoutes);
 app.use('/api', noteRoutes);
 app.use('/api', diaryNoteRoutes);
+app.use('/api', projectRoutes);
+app.use('/api', organizationRoutes);
 
 // 404 Handler
 app.use((req, res) => {
