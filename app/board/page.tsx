@@ -502,15 +502,15 @@ function WhiteboardCanvas() {
   ]
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#f5f5f5] dark:bg-gray-900">
+    <div className="relative w-full h-screen overflow-hidden bg-[#f5f5f5] dark:bg-gray-900 touch-manipulation">
       {/* Figma-style Toolbar */}
-      <div className="absolute top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-2">
+      <div className="absolute top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-2 sm:px-4 py-1.5 sm:py-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-semibold mr-4">Whiteboard</h1>
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
+            <h1 className="text-xs sm:text-sm font-semibold mr-2 sm:mr-4 whitespace-nowrap">Board</h1>
 
             {/* Tools */}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 sm:p-1">
               {tools.map((tool) => {
                 const Icon = tool.icon
                 return (
@@ -520,16 +520,16 @@ function WhiteboardCanvas() {
                     size="sm"
                     onClick={() => setSelectedTool(tool.value as Tool)}
                     title={tool.label}
-                    className="h-8 w-8 p-0"
+                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 active:scale-95"
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 )
               })}
             </div>
 
             {/* Shapes Dropdown */}
-            <div className="relative ml-2 menu-container">
+            <div className="relative ml-1 sm:ml-2 menu-container">
               <Button
                 variant={showShapeMenu ? "default" : "outline"}
                 size="sm"
@@ -537,10 +537,10 @@ function WhiteboardCanvas() {
                   setShowShapeMenu(!showShapeMenu)
                   setShowNoteMenu(false)
                 }}
-                className="h-8 gap-2"
+                className="h-7 sm:h-8 gap-1 sm:gap-2 px-2 sm:px-3 active:scale-95"
               >
-                <Square className="w-4 h-4" />
-                Shapes
+                <Square className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Shapes</span>
               </Button>
               {showShapeMenu && (
                 <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg p-2 w-64 z-50 menu-container">
@@ -585,13 +585,13 @@ function WhiteboardCanvas() {
                   setShowNoteMenu(!showNoteMenu)
                   setShowShapeMenu(false)
                 }}
-                className="h-8 gap-2"
+                className="h-7 sm:h-8 gap-1 sm:gap-2 px-2 sm:px-3 active:scale-95"
               >
-                <NoteIcon className="w-4 h-4" />
-                Sticky Notes
+                <NoteIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Notes</span>
               </Button>
               {showNoteMenu && (
-                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg p-3 w-80 z-50 max-h-[500px] overflow-y-auto menu-container">
+                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg p-2 sm:p-3 w-72 sm:w-80 z-50 max-h-[400px] sm:max-h-[500px] overflow-y-auto menu-container">
                   {/* Day Notes */}
                   <div className="mb-4">
                     <div className="text-xs font-semibold mb-2 text-gray-600 dark:text-gray-400">📅 Days of Week</div>
@@ -624,23 +624,26 @@ function WhiteboardCanvas() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={undo} disabled={historyStep === 0} className="h-8 px-3">
-              <Undo className="w-4 h-4 mr-1" /> Undo
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button variant="ghost" size="sm" onClick={undo} disabled={historyStep === 0} className="h-7 sm:h-8 px-2 sm:px-3 active:scale-95">
+              <Undo className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+              <span className="hidden md:inline">Undo</span>
             </Button>
-            <Button variant="ghost" size="sm" onClick={redo} disabled={historyStep >= history.length - 1} className="h-8 px-3">
-              <Redo className="w-4 h-4 mr-1" /> Redo
+            <Button variant="ghost" size="sm" onClick={redo} disabled={historyStep >= history.length - 1} className="h-7 sm:h-8 px-2 sm:px-3 active:scale-95">
+              <Redo className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+              <span className="hidden md:inline">Redo</span>
             </Button>
             {selectedId && (
               <>
                 <Button variant="ghost" size="sm" onClick={() => {
                   const shape = shapes.find(s => s.id === selectedId)
                   if (shape) setCopiedShape(shape)
-                }} className="h-8 px-3">
-                  <Copy className="w-4 h-4 mr-1" /> Copy
+                }} className="h-7 sm:h-8 px-2 sm:px-3 active:scale-95 hidden sm:flex">
+                  <Copy className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                  <span className="hidden md:inline">Copy</span>
                 </Button>
-                <Button variant="ghost" size="sm" onClick={deleteSelected} className="h-8 px-3 text-red-600">
-                  <Trash2 className="w-4 h-4 mr-1" /> Delete
+                <Button variant="ghost" size="sm" onClick={deleteSelected} className="h-7 sm:h-8 px-2 sm:px-3 text-red-600 active:scale-95">
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </>
             )}
@@ -743,30 +746,28 @@ function WhiteboardCanvas() {
         </DndProvider>
       </div>
 
-      {/* Stats and Help */}
-      <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-3 py-2 rounded-lg border text-xs">
-        <div className="flex items-center gap-3">
-          <span className="text-muted-foreground">
-            {shapes.length} shapes • {notes.length} notes • Tool: <span className="font-semibold text-foreground">{selectedTool}</span>
+      {/* Stats */}
+      <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border text-[10px] sm:text-xs">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="text-muted-foreground whitespace-nowrap">
+            {shapes.length} • {notes.length} • <span className="font-semibold text-foreground">{selectedTool}</span>
           </span>
           {selectedId && (
-            <span className="text-blue-600 dark:text-blue-400 font-medium">
-              Shape selected
+            <span className="text-blue-600 dark:text-blue-400 font-medium hidden sm:inline">
+              Selected
             </span>
           )}
         </div>
       </div>
 
-      {/* Keyboard Shortcuts Help */}
-      <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-3 py-2 rounded-lg border text-xs text-muted-foreground max-w-xs">
-        <div className="font-semibold mb-1 text-foreground">⌨️ Keyboard Shortcuts:</div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
-          <span>V - Select</span><span>S - Shapes Menu</span>
+      {/* Keyboard Shortcuts Help - Hide on mobile */}
+      <div className="hidden md:block absolute bottom-2 sm:bottom-4 right-2 sm:right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border text-[10px] sm:text-xs text-muted-foreground max-w-xs">
+        <div className="font-semibold mb-1 text-foreground">⌨️ Shortcuts:</div>
+        <div className="grid grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-0.5">
+          <span>V - Select</span><span>S - Shapes</span>
           <span>L - Line</span><span>A - Arrow</span>
           <span>P - Pen</span><span>T - Text</span>
-          <span>N - Notes Menu</span><span>Del - Delete</span>
-          <span>Esc - Close/Deselect</span><span>Ctrl+C - Copy</span>
-          <span>Ctrl+V - Paste</span><span>Ctrl+Z - Undo</span>
+          <span>N - Notes</span><span>Del - Delete</span>
         </div>
       </div>
     </div>

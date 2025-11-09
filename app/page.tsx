@@ -52,27 +52,29 @@ export default function HomePage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight text-balance">Your AI-Powered Knowledge Base</h1>
-        <p className="text-lg text-muted-foreground text-pretty">
+    <div className="mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-8 lg:px-8">
+      <div className="mb-6 sm:mb-8 space-y-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-balance">Your AI-Powered Knowledge Base</h1>
+        <p className="text-sm sm:text-base md:text-lg text-muted-foreground text-pretty">
           Save links, notes, and code snippets. Let AI organize and summarize everything for you.
         </p>
       </div>
 
       <ChatInput onItemSaved={handleItemSaved} />
 
-      <div className="mt-12">
+      <div className="mt-8 sm:mt-12">
         <Tabs defaultValue="grid" className="w-full">
-          <div className="flex items-center justify-between mb-6">
-            <TabsList>
-              <TabsTrigger value="grid" className="gap-2">
-                <LayoutGrid className="h-4 w-4" />
-                Grid View
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="grid" className="gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
+                <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Grid View</span>
+                <span className="sm:hidden">Grid</span>
               </TabsTrigger>
-              <TabsTrigger value="calendar" className="gap-2">
-                <Calendar className="h-4 w-4" />
-                Timeline
+              <TabsTrigger value="calendar" className="gap-1.5 sm:gap-2 flex-1 sm:flex-none text-xs sm:text-sm">
+                <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Timeline</span>
+                <span className="sm:hidden">Timeline</span>
               </TabsTrigger>
             </TabsList>
           </div>
