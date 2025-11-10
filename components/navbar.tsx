@@ -57,8 +57,9 @@ export function Navbar() {
     }
   }
 
-  // Don't show navbar on login page
-  if (pathname === '/login') {
+  // Don't show navbar on auth pages
+  const authPages = ['/login', '/signup', '/forgot-password']
+  if (authPages.includes(pathname)) {
     return null
   }
 
