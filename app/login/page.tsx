@@ -11,10 +11,8 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 
 export default function LoginPage() {
-  const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password')
-  const [step, setStep] = useState<'credentials' | 'otp'>('credentials')
+  const [step, setStep] = useState<'email' | 'otp'>('email')
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { requestLoginOTP, login, user } = useAuth()
@@ -27,47 +25,7 @@ export default function LoginPage() {
     }
   }, [user, router])
 
-  // Password-based login
-  const handlePasswordLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!email.trim() || !password.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter email and password",
-        variant: "destructive"
-      })
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      // Request OTP for verification (backend will send OTP)
-      await requestLoginOTP(email)
-
-      // Store password temporarily for verification after OTP
-      sessionStorage.setItem('temp_password', password)
-
-      setStep('otp')
-      toast({
-        title: "OTP Sent!",
-        description: "Check your email for the 6-digit OTP code",
-        duration: 5000
-      })
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Login failed",
-        variant: "destructive"
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // OTP-only login
-  const handleOTPRequest = async (e: React.FormEvent) => {
+  const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!email.trim()) {
@@ -90,9 +48,10 @@ export default function LoginPage() {
         duration: 5000
       })
     } catch (error: any) {
+      console.error('Login OTP request error:', error)
       toast({
         title: "Error",
-        description: error.message || "Failed to send OTP",
+        description: error.message || "Failed to send OTP. Please try again.",
         variant: "destructive"
       })
     } finally {
@@ -116,18 +75,15 @@ export default function LoginPage() {
 
     try {
       await login(email, otp)
-
-      // Clear temporary password
-      sessionStorage.removeItem('temp_password')
-
       toast({
         title: "Success!",
         description: "Login successful. Redirecting...",
       })
     } catch (error: any) {
+      console.error('OTP verification error:', error)
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid OTP",
+        description: error.message || "Invalid OTP. Please try again.",
         variant: "destructive"
       })
     } finally {
@@ -154,12 +110,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleBackToCredentials = () => {
-    setStep('credentials')
-    setOtp("")
-    sessionStorage.removeItem('temp_password')
-  }
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
@@ -169,6 +119,7 @@ export default function LoginPage() {
         className="w-full max-w-md"
       >
         <div className="bg-card border border-border rounded-lg p-8 shadow-lg">
+          {/* Logo */}
           <div className="flex items-center justify-center mb-8">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
@@ -178,139 +129,69 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Title */}
           <div className="text-center mb-6">
             <h2 className="text-2xl font-semibold text-foreground mb-2">
-              {step === 'credentials' ? 'Welcome Back' : 'Enter OTP'}
+              {step === 'email' ? 'Welcome Back' : 'Enter OTP'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {step === 'credentials'
-                ? 'Login with password or OTP'
-                : `We sent a 6-digit code to ${email}`}
+              {step === 'email'
+                ? 'Enter your email to receive an OTP'
+                : `Enter the OTP sent to ${email}`}
             </p>
           </div>
 
-          {step === 'credentials' && (
-            <>
-              {/* Login Method Toggle */}
-              <div className="flex gap-2 mb-6">
-                <button
-                  type="button"
-                  onClick={() => setLoginMethod('password')}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                    loginMethod === 'password'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-                >
-                  Password
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLoginMethod('otp')}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                    loginMethod === 'otp'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-                >
-                  OTP Only
-                </button>
+          {/* Email Step */}
+          {step === 'email' && (
+            <form onSubmit={handleRequestOTP} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
               </div>
 
-              {loginMethod === 'password' ? (
-                <form onSubmit={handlePasswordLogin} className="space-y-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                      Email
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                        autoFocus
-                      />
-                    </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending OTP...</span>
                   </div>
-
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                      />
-                    </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span>Continue</span>
+                    <ArrowRight className="h-4 w-4" />
                   </div>
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Logging in...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span>Login</span>
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
-                    )}
-                  </Button>
-                </form>
-              ) : (
-                <form onSubmit={handleOTPRequest} className="space-y-4">
-                  <div>
-                    <label htmlFor="email-otp" className="block text-sm font-medium text-foreground mb-2">
-                      Email
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email-otp"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        disabled={isLoading}
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Sending OTP...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span>Continue</span>
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
-                    )}
-                  </Button>
-                </form>
-              )}
-            </>
+                )}
+              </Button>
+            </form>
           )}
 
+          {/* OTP Step */}
           {step === 'otp' && (
             <form onSubmit={handleVerifyOTP} className="space-y-4">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-400 text-center">
+                  Check your email for the 6-digit OTP code
+                </p>
+              </div>
+
               <div>
                 <label htmlFor="otp" className="block text-sm font-medium text-foreground mb-2">
                   OTP Code
@@ -331,7 +212,11 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading || otp.length !== 6}
+              >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -345,11 +230,14 @@ export default function LoginPage() {
               <div className="flex items-center justify-between text-sm">
                 <button
                   type="button"
-                  onClick={handleBackToCredentials}
+                  onClick={() => {
+                    setStep('email')
+                    setOtp("")
+                  }}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                   disabled={isLoading}
                 >
-                  Back
+                  Change Email
                 </button>
                 <button
                   type="button"
@@ -363,6 +251,7 @@ export default function LoginPage() {
             </form>
           )}
 
+          {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border"></div>
@@ -372,6 +261,7 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
@@ -381,7 +271,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {step === 'credentials' && (
+          {/* Forgot Password Link */}
+          {step === 'email' && (
             <div className="text-center mt-4">
               <Link
                 href="/forgot-password"
@@ -392,6 +283,7 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-muted-foreground">
               SaveIt.AI - Your personal knowledge management system

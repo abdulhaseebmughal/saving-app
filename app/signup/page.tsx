@@ -30,16 +30,25 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!name.trim() || !email.trim() || !password.trim()) {
+    if (!name.trim()) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Please enter your name",
         variant: "destructive"
       })
       return
     }
 
-    if (password.length < 6) {
+    if (!email.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your email",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!password.trim() || password.length < 6) {
       toast({
         title: "Error",
         description: "Password must be at least 6 characters",
@@ -59,9 +68,10 @@ export default function SignupPage() {
         duration: 5000
       })
     } catch (error: any) {
+      console.error('Signup error:', error)
       toast({
         title: "Error",
-        description: error.message || "Signup failed",
+        description: error.message || "Signup failed. Please try again.",
         variant: "destructive"
       })
     } finally {
@@ -90,9 +100,10 @@ export default function SignupPage() {
         description: "Account created successfully. Redirecting...",
       })
     } catch (error: any) {
+      console.error('OTP verification error:', error)
       toast({
         title: "Verification Failed",
-        description: error.message || "Invalid OTP",
+        description: error.message || "Invalid OTP. Please try again.",
         variant: "destructive"
       })
     } finally {
@@ -144,7 +155,7 @@ export default function SignupPage() {
             <p className="text-sm text-muted-foreground">
               {step === 'details'
                 ? 'Sign up to start saving your knowledge'
-                : `We sent a 6-digit code to ${email}`}
+                : `Enter the OTP sent to ${email}`}
             </p>
           </div>
 
@@ -223,6 +234,12 @@ export default function SignupPage() {
 
           {step === 'otp' && (
             <form onSubmit={handleVerifyOTP} className="space-y-4">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-400 text-center">
+                  Check your email for the 6-digit OTP code
+                </p>
+              </div>
+
               <div>
                 <label htmlFor="otp" className="block text-sm font-medium text-foreground mb-2">
                   OTP Code
@@ -243,7 +260,7 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || otp.length !== 6}>
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
