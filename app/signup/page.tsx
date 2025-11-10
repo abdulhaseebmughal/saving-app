@@ -4,18 +4,20 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react"
+import { Sparkles, Mail, Lock, User, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
 
-export default function LoginPage() {
-  const [step, setStep] = useState<'email' | 'otp'>('email')
+export default function SignupPage() {
+  const [step, setStep] = useState<'details' | 'otp'>('details')
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const { requestLoginOTP, login, user } = useAuth()
+  const { signup, verifySignup, user } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
 
@@ -25,13 +27,22 @@ export default function LoginPage() {
     }
   }, [user, router])
 
-  const handleRequestOTP = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!email.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim()) {
       toast({
         title: "Error",
-        description: "Please enter your email",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters",
         variant: "destructive"
       })
       return
@@ -40,7 +51,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await requestLoginOTP(email)
+      await signup(name, email, password)
       setStep('otp')
       toast({
         title: "OTP Sent!",
@@ -50,7 +61,7 @@ export default function LoginPage() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to send OTP",
+        description: error.message || "Signup failed",
         variant: "destructive"
       })
     } finally {
@@ -73,14 +84,14 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login(email, otp)
+      await verifySignup(email, otp)
       toast({
         title: "Success!",
-        description: "Login successful. Redirecting...",
+        description: "Account created successfully. Redirecting...",
       })
     } catch (error: any) {
       toast({
-        title: "Login Failed",
+        title: "Verification Failed",
         description: error.message || "Invalid OTP",
         variant: "destructive"
       })
@@ -92,7 +103,7 @@ export default function LoginPage() {
   const handleResendOTP = async () => {
     setIsLoading(true)
     try {
-      await requestLoginOTP(email)
+      await signup(name, email, password)
       toast({
         title: "OTP Resent!",
         description: "Check your email for a new OTP code",
@@ -117,7 +128,6 @@ export default function LoginPage() {
         className="w-full max-w-md"
       >
         <div className="bg-card border border-border rounded-lg p-8 shadow-lg">
-          {/* Logo */}
           <div className="flex items-center justify-center mb-8">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
@@ -127,21 +137,38 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Title */}
           <div className="text-center mb-6">
             <h2 className="text-2xl font-semibold text-foreground mb-2">
-              {step === 'email' ? 'Welcome Back' : 'Enter OTP'}
+              {step === 'details' ? 'Create Account' : 'Verify Email'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {step === 'email'
-                ? 'Enter your email to receive an OTP'
+              {step === 'details'
+                ? 'Sign up to start saving your knowledge'
                 : `We sent a 6-digit code to ${email}`}
             </p>
           </div>
 
-          {/* Email Step */}
-          {step === 'email' && (
-            <form onSubmit={handleRequestOTP} className="space-y-4">
+          {step === 'details' && (
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                  Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="pl-10"
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email
@@ -156,24 +183,37 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                     disabled={isLoading}
-                    autoFocus
                   />
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="At least 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Sending OTP...</span>
+                    <span>Creating Account...</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <span>Continue</span>
+                    <span>Sign Up</span>
                     <ArrowRight className="h-4 w-4" />
                   </div>
                 )}
@@ -181,7 +221,6 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* OTP Step */}
           {step === 'otp' && (
             <form onSubmit={handleVerifyOTP} className="space-y-4">
               <div>
@@ -204,29 +243,25 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Verifying...</span>
                   </div>
                 ) : (
-                  "Verify & Login"
+                  "Verify & Create Account"
                 )}
               </Button>
 
               <div className="flex items-center justify-between text-sm">
                 <button
                   type="button"
-                  onClick={() => setStep('email')}
+                  onClick={() => setStep('details')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                   disabled={isLoading}
                 >
-                  Change Email
+                  Change Details
                 </button>
                 <button
                   type="button"
@@ -240,7 +275,6 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border"></div>
@@ -250,29 +284,15 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-primary hover:text-primary/80 font-medium">
-                Sign up
+              Already have an account?{' '}
+              <Link href="/login" className="text-primary hover:text-primary/80 font-medium">
+                Login
               </Link>
             </p>
           </div>
 
-          {/* Forgot Password Link */}
-          {step === 'email' && (
-            <div className="text-center mt-4">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Forgot your password?
-              </Link>
-            </div>
-          )}
-
-          {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-muted-foreground">
               SaveIt.AI - Your personal knowledge management system
