@@ -86,20 +86,23 @@ const rateLimiter = (maxRequests = 100, windowMs = 60000) => {
 };
 
 // Clean up old entries periodically (every 5 minutes)
-setInterval(() => {
-  const now = Date.now();
-  const fiveMinutesAgo = now - 5 * 60 * 1000;
+// Only run cleanup in non-serverless environments
+if (process.env.NODE_ENV !== 'production') {
+  setInterval(() => {
+    const now = Date.now();
+    const fiveMinutesAgo = now - 5 * 60 * 1000;
 
-  for (const [identifier, requests] of requestCounts.entries()) {
-    const recentRequests = requests.filter(timestamp => timestamp > fiveMinutesAgo);
+    for (const [identifier, requests] of requestCounts.entries()) {
+      const recentRequests = requests.filter(timestamp => timestamp > fiveMinutesAgo);
 
-    if (recentRequests.length === 0) {
-      requestCounts.delete(identifier);
-    } else {
-      requestCounts.set(identifier, recentRequests);
+      if (recentRequests.length === 0) {
+        requestCounts.delete(identifier);
+      } else {
+        requestCounts.set(identifier, recentRequests);
+      }
     }
-  }
-}, 5 * 60 * 1000);
+  }, 5 * 60 * 1000);
+}
 
 module.exports = {
   isValidObjectId,

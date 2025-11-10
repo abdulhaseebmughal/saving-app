@@ -60,7 +60,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Security middleware
 app.use(validateBodySize);
-app.use(rateLimiter(200, 60000)); // 200 requests per minute
+// Rate limiter disabled in production (use Vercel's rate limiting instead)
+if (process.env.NODE_ENV !== 'production') {
+  app.use(rateLimiter(200, 60000)); // 200 requests per minute
+}
 
 // Ensure MongoDB connection before each request (for serverless)
 app.use(async (req, res, next) => {
