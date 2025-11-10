@@ -90,7 +90,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check route
+// Health check route - Updated for v1.1
 app.get('/health', (req, res) => {
   const mongoose = require('mongoose');
   const dbStatus = mongoose.connection.readyState;
