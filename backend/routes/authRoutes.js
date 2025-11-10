@@ -4,7 +4,15 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
 const LoginConfirmation = require('../models/LoginConfirmation');
-const { sendLoginConfirmation } = require('../services/emailService');
+
+// Lazy load email service to prevent initialization errors
+let sendLoginConfirmation = null;
+try {
+  const emailService = require('../services/emailService');
+  sendLoginConfirmation = emailService.sendLoginConfirmation;
+} catch (error) {
+  console.warn('Email service not available:', error.message);
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'saveit-ai-secret-key-2025';
 const STATIC_PASSWORD = 'HaseebKhan19006';
@@ -79,21 +87,31 @@ router.post('/auth/login', async (req, res) => {
     await loginConfirmation.save();
 
     // Try to send confirmation email
-    try {
-      const emailResult = await sendLoginConfirmation(ADMIN_EMAIL, {
-        username: user.username,
-        ipAddress,
-        userAgent,
-        confirmToken,
-        location: 'Unknown' // Can be enhanced with IP geolocation service
-      });
+    if (sendLoginConfirmation) {
+      try {
+        const emailResult = await sendLoginConfirmation(ADMIN_EMAIL, {
+          username: user.username,
+          ipAddress,
+          userAgent,
+          confirmToken,
+          location: 'Unknown' // Can be enhanced with IP geolocation service
+        });
 
-      if (!emailResult.success) {
-        console.error('Failed to send confirmation email:', emailResult.error);
+        if (!emailResult.success) {
+          console.error('Failed to send confirmation email:', emailResult.error);
+          // Auto-confirm if email fails
+          loginConfirmation.confirmed = true;
+          await loginConfirmation.save();
+        }
+      } catch (emailError) {
+        console.error('Email service error:', emailError);
+        // Continue even if email fails - auto-confirm for development
+        loginConfirmation.confirmed = true;
+        await loginConfirmation.save();
       }
-    } catch (emailError) {
-      console.error('Email service error:', emailError);
-      // Continue even if email fails - for now, auto-confirm for development
+    } else {
+      // Email service not available - auto-confirm
+      console.warn('Email service not loaded - auto-confirming login');
       loginConfirmation.confirmed = true;
       await loginConfirmation.save();
     }
