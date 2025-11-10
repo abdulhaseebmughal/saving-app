@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { validateBodySize, rateLimiter } = require('./middleware/requestValidator');
 const itemRoutes = require('./routes/itemRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const diaryNoteRoutes = require('./routes/diaryNoteRoutes');
@@ -56,6 +58,10 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Security middleware
+app.use(validateBodySize);
+app.use(rateLimiter(200, 60000)); // 200 requests per minute
+
 // Ensure MongoDB connection before each request (for serverless)
 app.use(async (req, res, next) => {
   try {
@@ -63,7 +69,15 @@ app.use(async (req, res, next) => {
     next();
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
-    next(); // Continue even if DB connection fails, let routes handle it
+    // Return error for non-health check routes
+    if (req.path !== '/health') {
+      return res.status(503).json({
+        success: false,
+        error: 'Database connection unavailable',
+        message: 'Please ensure MONGO_URI is configured in environment variables'
+      });
+    }
+    next();
   }
 });
 
@@ -112,24 +126,11 @@ app.use('/api', organizationRoutes);
 app.use('/api', industryRoutes);
 app.use('/api', fileRoutes);
 
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Route not found'
-  });
-});
+// 404 Handler - Must be after all routes
+app.use(notFoundHandler);
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-
-  res.status(err.status || 500).json({
-    success: false,
-    error: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+// Global Error Handler - Must be last
+app.use(errorHandler);
 
 // For Vercel serverless deployment, export the app
 // For local development, start the server

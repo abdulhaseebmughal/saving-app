@@ -23,10 +23,21 @@ router.post('/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Validate input
     if (!username || !password) {
       return res.status(400).json({
         success: false,
         error: 'Username and password are required'
+      });
+    }
+
+    // Sanitize username
+    const sanitizedUsername = username.toString().trim().toLowerCase();
+
+    if (sanitizedUsername.length < 3 || sanitizedUsername.length > 30) {
+      return res.status(400).json({
+        success: false,
+        error: 'Username must be between 3 and 30 characters'
       });
     }
 
@@ -39,11 +50,11 @@ router.post('/auth/login', async (req, res) => {
     }
 
     // Find or create user
-    let user = await User.findOne({ username: username.toLowerCase() });
+    let user = await User.findOne({ username: sanitizedUsername });
 
     if (!user) {
       user = new User({
-        username: username.toLowerCase(),
+        username: sanitizedUsername,
         password: STATIC_PASSWORD
       });
       await user.save();
@@ -212,7 +223,7 @@ router.get('/auth/confirm-login', async (req, res) => {
     }
 
     // Generate final JWT token (30-day expiry)
-    const token = jwt.sign(
+    const finalToken = jwt.sign(
       {
         userId: confirmation.userId,
         username: confirmation.username
@@ -223,7 +234,7 @@ router.get('/auth/confirm-login', async (req, res) => {
 
     // Redirect to frontend with token
     const frontendUrl = process.env.FRONTEND_URL || 'https://saving-app-ador.vercel.app';
-    res.redirect(`${frontendUrl}/auth/confirmed?token=${token}`);
+    res.redirect(`${frontendUrl}/auth/confirmed?token=${finalToken}`);
   } catch (error) {
     console.error('Confirm login error:', error);
     res.status(500).json({

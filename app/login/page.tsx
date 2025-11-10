@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/auth-context"
 export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
   const { login, user } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
@@ -36,17 +37,31 @@ export default function LoginPage() {
     }
 
     setIsLoading(true)
+    setAwaitingConfirmation(false)
 
     try {
       await login("user", password)
+
+      // Check if awaiting email confirmation
+      setAwaitingConfirmation(true)
       toast({
-        title: "Welcome!",
-        description: "Successfully logged in"
+        title: "Check Your Email",
+        description: "Please confirm the login from your email within 10 minutes",
+        duration: 10000
       })
     } catch (error: any) {
+      setAwaitingConfirmation(false)
+
+      let errorMessage = "Invalid password"
+      if (error.message) {
+        errorMessage = error.message
+      } else if (error.toString().includes('NetworkError') || error.toString().includes('Failed to fetch')) {
+        errorMessage = "Network error. Please check your connection."
+      }
+
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid password",
+        description: errorMessage,
         variant: "destructive"
       })
     } finally {
@@ -77,9 +92,24 @@ export default function LoginPage() {
           <div className="text-center mb-6">
             <h2 className="text-2xl font-semibold text-foreground mb-2">Welcome Back</h2>
             <p className="text-sm text-muted-foreground">
-              Enter your password to access your account
+              {awaitingConfirmation
+                ? "Waiting for email confirmation..."
+                : "Enter your password to access your account"}
             </p>
           </div>
+
+          {/* Email Confirmation Alert */}
+          {awaitingConfirmation && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg"
+            >
+              <p className="text-sm text-blue-400 text-center">
+                📧 Check your email and click the confirmation link to complete login
+              </p>
+            </motion.div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
