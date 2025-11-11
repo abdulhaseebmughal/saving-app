@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar"
 import { PWARegister } from "@/components/pwa-register"
 import { AuthProvider } from "@/contexts/auth-context"
 import { AuthGuard } from "@/components/auth-guard"
+import { AdminShortcut } from "@/components/admin-shortcut"
 import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -44,6 +45,7 @@ export default function RootLayout({
             <Navbar />
             <main className="min-h-screen bg-background">{children}</main>
           </AuthGuard>
+<AdminShortcut />
           <Toaster />
         </AuthProvider>
       </body>
