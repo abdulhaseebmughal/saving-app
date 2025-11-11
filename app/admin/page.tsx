@@ -69,12 +69,7 @@ export default function AdminPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const url = `${API_BASE_URL}/admin/dashboard?email=${encodeURIComponent(ADMIN_EMAIL)}&password=${encodeURIComponent(ADMIN_PASSWORD)}`
-      console.log('Fetching dashboard')
-
-      const response = await fetch(url, {
-        method: 'POST'
-      })
+      const response = await fetch(`${API_BASE_URL}/admin/dashboard`)
 
       console.log('Response status:', response.status)
       console.log('Response headers:', Object.fromEntries(response.headers.entries()))
@@ -164,8 +159,7 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to delete this item?')) return
 
     try {
-      const url = `${API_BASE_URL}/admin/${collection}/${id}?email=${encodeURIComponent(ADMIN_EMAIL)}&password=${encodeURIComponent(ADMIN_PASSWORD)}`
-      const response = await fetch(url, {
+      const response = await fetch(`${API_BASE_URL}/admin/${collection}/${id}`, {
         method: 'DELETE'
       })
 
