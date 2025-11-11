@@ -42,7 +42,8 @@
       "Bash(node -e:*)",
       "Bash(if exist \"app\\signup\" echo exists else mkdir appsignup)",
       "Bash(node scripts/fix-database.js:*)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []
