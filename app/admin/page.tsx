@@ -69,6 +69,8 @@ export default function AdminPage() {
 
   const fetchDashboardData = async () => {
     try {
+      console.log('Fetching dashboard from:', `${API_BASE_URL}/admin/dashboard`)
+
       const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
         headers: {
           'email': ADMIN_EMAIL,
@@ -76,11 +78,35 @@ export default function AdminPage() {
         }
       })
 
+      console.log('Response status:', response.status)
       const result = await response.json()
+      console.log('Dashboard result:', result)
+
       if (result.success) {
+        console.log('Setting data:', {
+          users: result.data.users?.length,
+          items: result.data.items?.length,
+          notes: result.data.notes?.length,
+          diaryNotes: result.data.diaryNotes?.length,
+          projects: result.data.projects?.length,
+          files: result.data.files?.length,
+          organizations: result.data.organizations?.length,
+          industries: result.data.industries?.length
+        })
         setData(result.data)
         setStats(result.stats)
         setAdminData(result.adminData)
+
+        toast({
+          title: "Success",
+          description: `Loaded ${result.stats.totalUsers} users and ${result.stats.totalItems} items`,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to load dashboard data",
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('Error fetching dashboard:', error)
