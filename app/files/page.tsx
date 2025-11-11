@@ -203,6 +203,26 @@ export default function FilesPage() {
     }
   }
 
+  const handleDownloadFile = (file: FileItem) => {
+    // For now, we'll create a simple text file with file info since actual files aren't stored
+    // In production with cloud storage, you'd fetch the actual file from S3/Cloudinary
+    const fileInfo = `File: ${file.name}\nSize: ${formatFileSize(file.size)}\nType: ${file.type}\nCategory: ${file.category}\nUploaded: ${new Date(file.uploadedAt).toLocaleString()}`
+    const blob = new Blob([fileInfo], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${file.name}.info.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    toast({
+      title: "Download",
+      description: "File info downloaded (metadata only)"
+    })
+  }
+
   const handleDeleteFile = async (id: string) => {
     try {
       await fetch(`${API_BASE_URL}/files/${id}`, {
@@ -514,14 +534,26 @@ export default function FilesPage() {
                           </div>
                         </div>
 
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
-                          onClick={() => handleDeleteFile(file._id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-primary/10 hover:text-primary flex-shrink-0"
+                            onClick={() => handleDownloadFile(file)}
+                            title="Download"
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+                            onClick={() => handleDeleteFile(file._id)}
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2 flex-wrap">
