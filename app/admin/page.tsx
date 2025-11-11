@@ -70,16 +70,16 @@ export default function AdminPage() {
   const fetchDashboardData = async () => {
     try {
       console.log('Fetching dashboard from:', `${API_BASE_URL}/admin/dashboard`)
-      console.log('Sending headers:', { email: ADMIN_EMAIL, password: '***' })
 
       const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
-        method: 'GET',
-        mode: 'cors',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'email': ADMIN_EMAIL,
-          'password': ADMIN_PASSWORD
-        }
+        },
+        body: JSON.stringify({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        })
       })
 
       console.log('Response status:', response.status)
@@ -172,12 +172,13 @@ export default function AdminPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/admin/${collection}/${id}`, {
         method: 'DELETE',
-        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
-          'email': ADMIN_EMAIL,
-          'password': ADMIN_PASSWORD
-        }
+        },
+        body: JSON.stringify({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        })
       })
 
       const result = await response.json()
