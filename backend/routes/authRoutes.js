@@ -1,164 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const User = require('../models/User');
-const LoginConfirmation = require('../models/LoginConfirmation');
-
-// Lazy load email service to prevent initialization errors
-let sendLoginConfirmation = null;
-try {
-  const emailService = require('../services/emailService');
-  sendLoginConfirmation = emailService.sendLoginConfirmation;
-} catch (error) {
-  console.warn('Email service not available:', error.message);
-}
+const { sendOTP } = require('../services/emailService');
+const { asyncHandler } = require('../middleware/errorHandler');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'saveit-ai-secret-key-2025';
-const STATIC_PASSWORD = 'HaseebKhan19006';
-const ADMIN_EMAIL = 'abdulhaseebmughal2006@gmail.com';
+const JWT_EXPIRY = '30d'; // 30 days for persistent login
 
-// POST /api/auth/login
-router.post('/auth/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    // Validate input
-    if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        error: 'Username and password are required'
-      });
-    }
-
-    // Sanitize username
-    const sanitizedUsername = username.toString().trim().toLowerCase();
-
-    if (sanitizedUsername.length < 3 || sanitizedUsername.length > 30) {
-      return res.status(400).json({
-        success: false,
-        error: 'Username must be between 3 and 30 characters'
-      });
-    }
-
-    // Verify static password
-    if (password !== STATIC_PASSWORD) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials'
-      });
-    }
-
-    // Find or create user
-    let user = await User.findOne({ username: sanitizedUsername });
-
-    if (!user) {
-      user = new User({
-        username: sanitizedUsername,
-        password: STATIC_PASSWORD
-      });
-      await user.save();
-    }
-
-    // Get login info
-    const ipAddress = req.headers['x-forwarded-for'] ||
-                     req.headers['x-real-ip'] ||
-                     req.connection.remoteAddress ||
-                     req.socket.remoteAddress ||
-                     'Unknown';
-
-    const userAgent = req.headers['user-agent'] || 'Unknown';
-
-    // Generate confirmation token
-    const confirmToken = crypto.randomBytes(32).toString('hex');
-
-    // Generate temporary JWT (will be replaced after confirmation)
-    const tempToken = jwt.sign(
-      {
-        userId: user._id,
-        username: user.username,
-        temp: true
-      },
-      JWT_SECRET,
-      { expiresIn: '10m' }
-    );
-
-    // Create login confirmation record
-    const loginConfirmation = new LoginConfirmation({
-      userId: user._id,
-      username: user.username,
-      email: ADMIN_EMAIL,
-      confirmToken,
-      ipAddress,
-      userAgent,
-      tempToken,
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
-    });
-
-    await loginConfirmation.save();
-
-    // Try to send confirmation email
-    if (sendLoginConfirmation) {
-      try {
-        const emailResult = await sendLoginConfirmation(ADMIN_EMAIL, {
-          username: user.username,
-          ipAddress,
-          userAgent,
-          confirmToken,
-          location: 'Unknown' // Can be enhanced with IP geolocation service
-        });
-
-        if (!emailResult.success) {
-          console.error('Failed to send confirmation email:', emailResult.error);
-          // Auto-confirm if email fails
-          loginConfirmation.confirmed = true;
-          await loginConfirmation.save();
-        }
-      } catch (emailError) {
-        console.error('Email service error:', emailError);
-        // Continue even if email fails - auto-confirm for development
-        loginConfirmation.confirmed = true;
-        await loginConfirmation.save();
-      }
-    } else {
-      // Email service not available - auto-confirm
-      console.warn('Email service not loaded - auto-confirming login');
-      loginConfirmation.confirmed = true;
-      await loginConfirmation.save();
-    }
-
-    res.json({
-      success: true,
-      data: {
-        tempToken,
-        message: 'Please check your email to confirm this login',
-        expiresIn: '10 minutes',
-        awaitingConfirmation: true
-      }
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Login failed'
-    });
-  }
-});
-
-// GET /api/auth/verify
-router.get('/auth/verify', async (req, res) => {
+// Middleware to verify JWT token
+const authenticate = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
       return res.status(401).json({
         success: false,
-        error: 'No token provided'
+        error: 'Authentication required'
       });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
+    const user = await User.findById(decoded.userId).select('-password -otp');
 
     if (!user) {
       return res.status(401).json({
@@ -167,166 +30,501 @@ router.get('/auth/verify', async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      data: {
-        user: {
-          id: user._id,
-          username: user.username
-        }
-      }
-    });
+    req.user = user;
+    next();
   } catch (error) {
-    console.error('Verify token error:', error);
     res.status(401).json({
       success: false,
-      error: 'Invalid token'
+      error: 'Invalid or expired token'
     });
   }
-});
+};
 
-// GET /api/auth/confirm-login
-router.get('/auth/confirm-login', async (req, res) => {
-  try {
-    const { token } = req.query;
+/**
+ * POST /api/auth/signup
+ * Step 1: Register new user and send OTP
+ */
+router.post('/auth/signup', asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-    if (!token) {
-      return res.status(400).json({
-        success: false,
-        error: 'Confirmation token is required'
-      });
-    }
-
-    // Find the login confirmation
-    const confirmation = await LoginConfirmation.findOne({
-      confirmToken: token,
-      confirmed: false,
-      expiresAt: { $gt: new Date() }
-    });
-
-    if (!confirmation) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid or expired confirmation link'
-      });
-    }
-
-    // Mark as confirmed
-    confirmation.confirmed = true;
-    await confirmation.save();
-
-    // Update user last login
-    const user = await User.findById(confirmation.userId);
-    if (user) {
-      user.lastLogin = new Date();
-      await user.save();
-    }
-
-    // Generate final JWT token (30-day expiry)
-    const finalToken = jwt.sign(
-      {
-        userId: confirmation.userId,
-        username: confirmation.username
-      },
-      JWT_SECRET,
-      { expiresIn: '30d' }
-    );
-
-    // Redirect to frontend with token
-    const frontendUrl = process.env.FRONTEND_URL || 'https://saving-app-ador.vercel.app';
-    res.redirect(`${frontendUrl}/auth/confirmed?token=${finalToken}`);
-  } catch (error) {
-    console.error('Confirm login error:', error);
-    res.status(500).json({
+  // Validate input
+  if (!name || !email || !password) {
+    return res.status(400).json({
       success: false,
-      error: 'Failed to confirm login'
+      error: 'Name, email, and password are required'
     });
   }
-});
 
-// POST /api/auth/check-confirmation
-router.post('/auth/check-confirmation', async (req, res) => {
-  try {
-    const { tempToken } = req.body;
-
-    if (!tempToken) {
-      return res.status(400).json({
-        success: false,
-        error: 'Temp token is required'
-      });
-    }
-
-    // Verify temp token
-    const decoded = jwt.verify(tempToken, JWT_SECRET);
-
-    // Check if login has been confirmed
-    const confirmation = await LoginConfirmation.findOne({
-      userId: decoded.userId,
-      tempToken,
-      confirmed: true
+  // Validate email format
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid email format'
     });
+  }
 
-    if (confirmation) {
-      // Generate final token
-      const finalToken = jwt.sign(
-        {
-          userId: decoded.userId,
-          username: decoded.username
-        },
-        JWT_SECRET,
-        { expiresIn: '30d' }
-      );
+  // Validate password length
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: 'Password must be at least 6 characters'
+    });
+  }
+
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    if (existingUser.isVerified) {
+      return res.status(409).json({
+        success: false,
+        error: 'Email already registered. Please login instead.'
+      });
+    } else {
+      // User exists but not verified - resend OTP
+      const otp = existingUser.generateOTP('signup');
+      await existingUser.save();
+
+      const emailResult = await sendOTP(email, otp, 'signup', name);
 
       return res.json({
         success: true,
-        confirmed: true,
-        data: {
-          token: finalToken,
-          user: {
-            id: decoded.userId,
-            username: decoded.username
-          }
-        }
+        message: 'OTP resent to your email. Please verify to complete signup.',
+        emailSent: emailResult.success
       });
     }
+  }
 
-    // Check if expired
-    const pendingConfirmation = await LoginConfirmation.findOne({
-      userId: decoded.userId,
-      tempToken,
-      confirmed: false
-    });
+  // Create new user
+  const user = new User({
+    name,
+    email: email.toLowerCase(),
+    password,
+    isVerified: false
+  });
 
-    if (!pendingConfirmation || pendingConfirmation.expiresAt < new Date()) {
-      return res.json({
-        success: false,
-        confirmed: false,
-        expired: true,
-        message: 'Login confirmation expired. Please login again.'
-      });
-    }
+  // Generate and save OTP
+  const otp = user.generateOTP('signup');
+  await user.save();
 
-    res.json({
-      success: true,
-      confirmed: false,
-      message: 'Awaiting email confirmation'
-    });
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.json({
-        success: false,
-        confirmed: false,
-        expired: true,
-        message: 'Login session expired. Please login again.'
-      });
-    }
+  // Send OTP email
+  const emailResult = await sendOTP(email, otp, 'signup', name);
 
-    console.error('Check confirmation error:', error);
-    res.status(500).json({
+  res.status(201).json({
+    success: true,
+    message: 'Signup successful! Please check your email for OTP.',
+    emailSent: emailResult.success
+  });
+}));
+
+/**
+ * POST /api/auth/verify-signup
+ * Step 2: Verify OTP and complete signup
+ */
+router.post('/auth/verify-signup', asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({
       success: false,
-      error: 'Failed to check confirmation status'
+      error: 'Email and OTP are required'
     });
   }
-});
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: 'User not found'
+    });
+  }
+
+  if (user.isVerified) {
+    return res.status(400).json({
+      success: false,
+      error: 'Email already verified. Please login.'
+    });
+  }
+
+  // Verify OTP
+  if (!user.verifyOTP(otp, 'signup')) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid or expired OTP'
+    });
+  }
+
+  // Mark user as verified and clear OTP
+  user.isVerified = true;
+  user.clearOTP();
+  user.lastLogin = new Date();
+  await user.save();
+
+  // Generate JWT token
+  const token = jwt.sign(
+    {
+      userId: user._id,
+      email: user.email
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRY }
+  );
+
+  res.json({
+    success: true,
+    message: 'Email verified successfully!',
+    data: {
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    }
+  });
+}));
+
+/**
+ * POST /api/auth/login
+ * Step 1: Request OTP for login
+ */
+router.post('/auth/login', asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      error: 'Email is required'
+    });
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: 'No account found with this email'
+    });
+  }
+
+  if (!user.isVerified) {
+    return res.status(403).json({
+      success: false,
+      error: 'Please complete signup verification first'
+    });
+  }
+
+  // Generate and save OTP
+  const otp = user.generateOTP('login');
+  await user.save();
+
+  // Send OTP email
+  const emailResult = await sendOTP(email, otp, 'login', user.name);
+
+  res.json({
+    success: true,
+    message: 'OTP sent to your email',
+    emailSent: emailResult.success
+  });
+}));
+
+/**
+ * POST /api/auth/verify-login
+ * Step 2: Verify OTP and complete login
+ */
+router.post('/auth/verify-login', asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({
+      success: false,
+      error: 'Email and OTP are required'
+    });
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: 'User not found'
+    });
+  }
+
+  // Verify OTP
+  if (!user.verifyOTP(otp, 'login')) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid or expired OTP'
+    });
+  }
+
+  // Update last login and clear OTP
+  user.lastLogin = new Date();
+  user.clearOTP();
+  await user.save();
+
+  // Generate JWT token
+  const token = jwt.sign(
+    {
+      userId: user._id,
+      email: user.email
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRY }
+  );
+
+  res.json({
+    success: true,
+    message: 'Login successful!',
+    data: {
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    }
+  });
+}));
+
+/**
+ * POST /api/auth/forgot-password
+ * Step 1: Request OTP for password reset
+ */
+router.post('/auth/forgot-password', asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      error: 'Email is required'
+    });
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+
+  if (!user) {
+    // Don't reveal if email exists
+    return res.json({
+      success: true,
+      message: 'If an account exists with this email, you will receive an OTP'
+    });
+  }
+
+  // Generate and save OTP
+  const otp = user.generateOTP('forgot-password');
+  await user.save();
+
+  // Send OTP email
+  await sendOTP(email, otp, 'forgot-password', user.name);
+
+  res.json({
+    success: true,
+    message: 'OTP sent to your email'
+  });
+}));
+
+/**
+ * POST /api/auth/reset-password
+ * Step 2: Verify OTP and reset password
+ */
+router.post('/auth/reset-password', asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      error: 'Email, OTP, and new password are required'
+    });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: 'Password must be at least 6 characters'
+    });
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: 'User not found'
+    });
+  }
+
+  // Verify OTP
+  if (!user.verifyOTP(otp, 'forgot-password')) {
+    return res.status(400).json({
+      success: false,
+      error: 'Invalid or expired OTP'
+    });
+  }
+
+  // Update password and clear OTP
+  user.password = newPassword;
+  user.clearOTP();
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Password reset successful! Please login with your new password.'
+  });
+}));
+
+/**
+ * GET /api/auth/verify
+ * Verify current token and get user info
+ */
+router.get('/auth/verify', authenticate, asyncHandler(async (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      }
+    }
+  });
+}));
+
+/**
+ * GET /api/auth/profile
+ * Get user profile
+ */
+router.get('/auth/profile', authenticate, asyncHandler(async (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        createdAt: req.user.createdAt,
+        lastLogin: req.user.lastLogin
+      }
+    }
+  });
+}));
+
+/**
+ * PUT /api/auth/profile
+ * Update user profile (name, email)
+ */
+router.put('/auth/profile', authenticate, asyncHandler(async (req, res) => {
+  const { name, email } = req.body;
+
+  const user = req.user;
+
+  // Update name if provided
+  if (name) {
+    if (name.length < 2 || name.length > 50) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name must be between 2 and 50 characters'
+      });
+    }
+    user.name = name;
+  }
+
+  // Update email if provided and different
+  if (email && email.toLowerCase() !== user.email) {
+    // Check if new email already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        error: 'Email already in use'
+      });
+    }
+
+    user.email = email.toLowerCase();
+    user.isVerified = false; // Require re-verification
+
+    // Generate OTP for email verification
+    const otp = user.generateOTP('signup');
+    await user.save();
+
+    // Send OTP to new email
+    await sendOTP(email, otp, 'signup', user.name);
+
+    return res.json({
+      success: true,
+      message: 'Email updated. Please verify your new email with the OTP sent.',
+      requiresVerification: true
+    });
+  }
+
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Profile updated successfully',
+    data: {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    }
+  });
+}));
+
+/**
+ * PUT /api/auth/change-password
+ * Change password (requires current password)
+ */
+router.put('/auth/change-password', authenticate, asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      error: 'Current password and new password are required'
+    });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: 'New password must be at least 6 characters'
+    });
+  }
+
+  const user = await User.findById(req.user._id);
+
+  // Verify current password
+  const isMatch = await user.comparePassword(currentPassword);
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      error: 'Current password is incorrect'
+    });
+  }
+
+  // Update password
+  user.password = newPassword;
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Password changed successfully'
+  });
+}));
+
+/**
+ * POST /api/auth/logout
+ * Logout (client-side token removal, but endpoint for tracking)
+ */
+router.post('/auth/logout', authenticate, asyncHandler(async (req, res) => {
+  res.json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+}));
 
 module.exports = router;

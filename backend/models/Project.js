@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
+  // User ownership
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+
   name: {
     type: String,
     required: true,
@@ -69,8 +77,9 @@ const projectSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-projectSchema.index({ organization: 1, createdAt: -1 });
-projectSchema.index({ type: 1 });
-projectSchema.index({ status: 1 });
+projectSchema.index({ userId: 1, createdAt: -1 });
+projectSchema.index({ userId: 1, organization: 1, createdAt: -1 });
+projectSchema.index({ userId: 1, type: 1 });
+projectSchema.index({ userId: 1, status: 1 });
 
 module.exports = mongoose.model('Project', projectSchema);

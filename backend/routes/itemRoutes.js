@@ -5,11 +5,11 @@ const cheerio = require('cheerio');
 const { body, validationResult, query } = require('express-validator');
 const Item = require('../models/Item');
 const { generateLinkMetadata, generateSummary, extractDomain, detectPlatform, detectCategory } = require('../utils/gemini');
+const authMiddleware = require('../middleware/authMiddleware');
 
 /**
  * @route   GET /api
- * @desc    API Base route - Status check
- * @access  Public
+ * @desc    API Base route - Status check (public)
  */
 router.get('/', async (req, res) => {
   try {
@@ -48,9 +48,9 @@ router.get('/', async (req, res) => {
 /**
  * @route   POST /api/save
  * @desc    Save new item (link, note, code, or component)
- * @access  Public
  */
 router.post('/save',
+  authMiddleware,
   [
     body('type').isIn(['link', 'note', 'code', 'component']).withMessage('Invalid type'),
     body('content').notEmpty().withMessage('Content is required')
@@ -164,8 +164,8 @@ router.post('/save',
         };
       }
 
-      // Save to database
-      const newItem = new Item(itemData);
+      // Save to database with userId
+      const newItem = new Item({ ...itemData, userId: req.user.userId });
       await newItem.save();
 
       res.status(201).json({
@@ -186,9 +186,9 @@ router.post('/save',
 /**
  * @route   GET /api/items
  * @desc    Fetch all items with optional filtering and pagination
- * @access  Public
  */
 router.get('/items',
+  authMiddleware,
   [
     query('type').optional().isIn(['link', 'note', 'code', 'component']),
     query('page').optional().isInt({ min: 1 }),
@@ -211,8 +211,8 @@ router.get('/items',
         tags
       } = req.query;
 
-      // Build query
-      let query = {};
+      // Build query for current user only
+      let query = { userId: req.user.userId };
 
       if (type) {
         query.type = type;
@@ -265,11 +265,10 @@ router.get('/items',
 /**
  * @route   GET /api/item/:id
  * @desc    Get single item by ID
- * @access  Public
  */
-router.get('/item/:id', async (req, res) => {
+router.get('/item/:id', authMiddleware, async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id);
+    const item = await Item.findOne({ _id: req.params.id, userId: req.user.userId });
 
     if (!item) {
       return res.status(404).json({
@@ -295,9 +294,9 @@ router.get('/item/:id', async (req, res) => {
 /**
  * @route   PUT /api/item/:id
  * @desc    Update item by ID
- * @access  Public
  */
 router.put('/item/:id',
+  authMiddleware,
   [
     body('title').optional().isString(),
     body('description').optional().isString(),
@@ -321,8 +320,8 @@ router.put('/item/:id',
 
       updates.updatedAt = Date.now();
 
-      const item = await Item.findByIdAndUpdate(
-        req.params.id,
+      const item = await Item.findOneAndUpdate(
+        { _id: req.params.id, userId: req.user.userId },
         updates,
         { new: true, runValidators: true }
       );
@@ -352,11 +351,10 @@ router.put('/item/:id',
 /**
  * @route   DELETE /api/item/:id
  * @desc    Delete item by ID
- * @access  Public
  */
-router.delete('/item/:id', async (req, res) => {
+router.delete('/item/:id', authMiddleware, async (req, res) => {
   try {
-    const item = await Item.findByIdAndDelete(req.params.id);
+    const item = await Item.findOneAndDelete({ _id: req.params.id, userId: req.user.userId });
 
     if (!item) {
       return res.status(404).json({
@@ -382,12 +380,12 @@ router.delete('/item/:id', async (req, res) => {
 /**
  * @route   GET /api/stats
  * @desc    Get statistics about saved items
- * @access  Public
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', authMiddleware, async (req, res) => {
   try {
-    const totalItems = await Item.countDocuments();
+    const totalItems = await Item.countDocuments({ userId: req.user.userId });
     const itemsByType = await Item.aggregate([
+      { $match: { userId: req.user.userId } },
       {
         $group: {
           _id: '$type',
@@ -397,6 +395,7 @@ router.get('/stats', async (req, res) => {
     ]);
 
     const topTags = await Item.aggregate([
+      { $match: { userId: req.user.userId } },
       { $unwind: '$tags' },
       {
         $group: {

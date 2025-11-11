@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const ItemSchema = new mongoose.Schema({
+  // User ownership
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+
   type: {
     type: String,
     enum: ['link', 'note', 'code', 'component'],
@@ -78,8 +86,8 @@ const ItemSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-ItemSchema.index({ type: 1, createdAt: -1 });
-ItemSchema.index({ tags: 1 });
-ItemSchema.index({ domain: 1 });
+ItemSchema.index({ userId: 1, type: 1, createdAt: -1 });
+ItemSchema.index({ userId: 1, tags: 1 });
+ItemSchema.index({ userId: 1, domain: 1 });
 
 module.exports = mongoose.model('Item', ItemSchema);

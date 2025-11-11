@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const fileItemSchema = new mongoose.Schema({
+  // User ownership
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+
   name: {
     type: String,
     required: true,
@@ -37,7 +45,8 @@ const fileItemSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-fileItemSchema.index({ industry: 1, createdAt: -1 });
-fileItemSchema.index({ name: 'text' });
+fileItemSchema.index({ userId: 1, createdAt: -1 });
+fileItemSchema.index({ userId: 1, industry: 1, createdAt: -1 });
+fileItemSchema.index({ userId: 1, name: 'text' });
 
 module.exports = mongoose.model('FileItem', fileItemSchema);

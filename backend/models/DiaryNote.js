@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const DiaryNoteSchema = new mongoose.Schema({
+  // User ownership
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+
   title: {
     type: String,
     default: ''
@@ -28,5 +36,8 @@ const DiaryNoteSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Index for faster queries
+DiaryNoteSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('DiaryNote', DiaryNoteSchema);

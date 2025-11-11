@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const NoteSchema = new mongoose.Schema({
+  // User ownership
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+
   // Note content
   text: {
     type: String,
@@ -81,6 +89,6 @@ const NoteSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-NoteSchema.index({ createdAt: -1 });
+NoteSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Note', NoteSchema);

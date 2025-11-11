@@ -1,6 +1,26 @@
 // Backend API URL - Use environment variable or default to production
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api';
 
+// Get auth token from localStorage
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('saveit_token');
+}
+
+// Get auth headers
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  const token = getAuthToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
 export interface SavedItem {
   id: string
   type: "note" | "link" | "code" | "component"
@@ -30,9 +50,7 @@ export async function saveItem(item: Omit<SavedItem, "id" | "createdAt">): Promi
   try {
     const response = await fetch(`${API_BASE_URL}/save`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         type: item.type,
         content: item.content,
@@ -79,7 +97,9 @@ export async function saveItem(item: Omit<SavedItem, "id" | "createdAt">): Promi
 
 export async function fetchItems(): Promise<SavedItem[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/items`)
+    const response = await fetch(`${API_BASE_URL}/items`, {
+      headers: getAuthHeaders()
+    })
 
     if (!response.ok) {
       throw new Error('Failed to fetch items')
@@ -122,6 +142,7 @@ export async function deleteItem(id: string): Promise<void> {
   try {
     const response = await fetch(`${API_BASE_URL}/item/${id}`, {
       method: 'DELETE',
+      headers: getAuthHeaders()
     })
 
     if (!response.ok) {

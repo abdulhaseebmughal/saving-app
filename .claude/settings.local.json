@@ -36,7 +36,13 @@
       "Bash(.gitignore)",
       "Bash(python -m json.tool:*)",
       "Bash(timeout 10 pnpm dev:*)",
-      "Bash(pnpm dev)"
+      "Bash(pnpm dev)",
+      "Bash(npm view:*)",
+      "Bash(node -c:*)",
+      "Bash(node -e:*)",
+      "Bash(if exist \"app\\signup\" echo exists else mkdir appsignup)",
+      "Bash(node scripts/fix-database.js:*)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []
