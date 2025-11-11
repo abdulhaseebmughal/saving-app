@@ -40,24 +40,37 @@ export default function AdminPage() {
 
   const fetchStats = async () => {
     try {
-      const [itemsRes, notesRes, projectsRes] = await Promise.all([
+      const [itemsRes, notesRes, diaryNotesRes, projectsRes] = await Promise.all([
         fetch(`${API_BASE_URL}/items`, { headers: getAuthHeaders() }),
         fetch(`${API_BASE_URL}/notes`, { headers: getAuthHeaders() }),
+        fetch(`${API_BASE_URL}/diary-notes`, { headers: getAuthHeaders() }),
         fetch(`${API_BASE_URL}/projects`, { headers: getAuthHeaders() })
       ])
 
       const items = await itemsRes.json()
       const notes = await notesRes.json()
+      const diaryNotes = await diaryNotesRes.json()
       const projects = await projectsRes.json()
 
+      const itemCount = items.success ? items.data.length : 0
+      const notesCount = notes.success ? notes.data.length : 0
+      const diaryNotesCount = diaryNotes.success ? diaryNotes.data.length : 0
+      const projectsCount = projects.success ? projects.data.length : 0
+
       setStats({
-        totalUsers: 9, // Your data count
-        totalItems: items.data?.length || 0,
-        totalNotes: notes.data?.length || 0,
-        totalProjects: projects.data?.length || 0
+        totalUsers: 9,
+        totalItems: itemCount,
+        totalNotes: notesCount + diaryNotesCount,
+        totalProjects: projectsCount
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
+      setStats({
+        totalUsers: 9,
+        totalItems: 0,
+        totalNotes: 0,
+        totalProjects: 0
+      })
     }
   }
 

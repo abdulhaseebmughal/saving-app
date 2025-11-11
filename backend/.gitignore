@@ -1,5 +1,13 @@
 # Dependencies
 node_modules/
+<<<<<<< HEAD
+package-lock.json
+
+# Environment Variables
+.env
+.env.local
+.env.production
+=======
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -12,12 +20,21 @@ pnpm-lock.yaml
 .env.local
 .env.production
 .env.development
+>>>>>>> ad12f215d96e30ce5f8f57959d34beae1065b6ba
 
 # Logs
 logs/
 *.log
+<<<<<<< HEAD
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Files
+=======
 
 # OS files
+>>>>>>> ad12f215d96e30ce5f8f57959d34beae1065b6ba
 .DS_Store
 Thumbs.db
 
@@ -26,6 +43,11 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+<<<<<<< HEAD
+
+# Vercel
+.vercel
+=======
 *~
 
 # Testing
@@ -35,3 +57,4 @@ coverage/
 # Build
 dist/
 build/
+>>>>>>> ad12f215d96e30ce5f8f57959d34beae1065b6ba

@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const FileItem = require('../models/FileItem');
 const Industry = require('../models/Industry');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Configure multer for file uploads (memory storage for serverless)
 const storage = multer.memoryStorage();
@@ -14,7 +15,7 @@ const upload = multer({
 });
 
 // GET /api/files
-router.get('/files', async (req, res) => {
+router.get('/files', authMiddleware, async (req, res) => {
   try {
     const { industry } = req.query;
     const filter = {};
@@ -59,7 +60,7 @@ router.get('/files/:id', async (req, res) => {
 });
 
 // POST /api/files/upload
-router.post('/files/upload', upload.array('files', 20), async (req, res) => {
+router.post('/files/upload', authMiddleware, upload.array('files', 20), async (req, res) => {
   try {
     const files = req.files;
     const { industry } = req.body;
@@ -127,7 +128,7 @@ router.post('/files/upload', upload.array('files', 20), async (req, res) => {
 });
 
 // DELETE /api/files/:id
-router.delete('/files/:id', async (req, res) => {
+router.delete('/files/:id', authMiddleware, async (req, res) => {
   try {
     const file = await FileItem.findById(req.params.id);
 

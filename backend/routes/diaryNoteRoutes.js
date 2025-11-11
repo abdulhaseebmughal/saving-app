@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const DiaryNote = require('../models/DiaryNote');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Get all diary notes
-router.get('/diary-notes', async (req, res) => {
+router.get('/diary-notes', authMiddleware, async (req, res) => {
   try {
     const notes = await DiaryNote.find().sort({ isPinned: -1, createdAt: -1 });
     res.json({
@@ -19,7 +20,7 @@ router.get('/diary-notes', async (req, res) => {
 });
 
 // Create new diary note
-router.post('/diary-notes', async (req, res) => {
+router.post('/diary-notes', authMiddleware, async (req, res) => {
   try {
     const note = new DiaryNote(req.body);
     await note.save();
@@ -36,7 +37,7 @@ router.post('/diary-notes', async (req, res) => {
 });
 
 // Update diary note
-router.put('/diary-notes/:id', async (req, res) => {
+router.put('/diary-notes/:id', authMiddleware, async (req, res) => {
   try {
     const note = await DiaryNote.findByIdAndUpdate(
       req.params.id,
@@ -62,7 +63,7 @@ router.put('/diary-notes/:id', async (req, res) => {
 });
 
 // Delete diary note
-router.delete('/diary-notes/:id', async (req, res) => {
+router.delete('/diary-notes/:id', authMiddleware, async (req, res) => {
   try {
     const note = await DiaryNote.findByIdAndDelete(req.params.id);
     if (!note) {
