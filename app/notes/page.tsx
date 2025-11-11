@@ -8,6 +8,14 @@ import { motion, AnimatePresence } from "framer-motion"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
+function getAuthHeaders() {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('saveit_token') : null
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  }
+}
+
 interface DiaryNote {
   _id: string
   title: string
@@ -41,7 +49,9 @@ export default function NotesPage() {
 
   const fetchNotes = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/diary-notes`)
+      const response = await fetch(`${API_BASE_URL}/diary-notes`, {
+        headers: getAuthHeaders()
+      })
       if (response.ok) {
         const result = await response.json()
         setNotes(result.success ? result.data : [])
@@ -55,7 +65,7 @@ export default function NotesPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/diary-notes`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           title: '',
           content: '',
@@ -79,7 +89,7 @@ export default function NotesPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/diary-notes/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(updates)
       })
       if (response.ok) {
@@ -94,7 +104,10 @@ export default function NotesPage() {
 
   const deleteNote = async (id: string) => {
     try {
-      await fetch(`${API_BASE_URL}/diary-notes/${id}`, { method: 'DELETE' })
+      await fetch(`${API_BASE_URL}/diary-notes/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      })
       setNotes(notes.filter(note => note._id !== id))
       toast({ title: "Note deleted" })
     } catch (error) {

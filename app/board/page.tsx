@@ -10,6 +10,14 @@ import { AnimatePresence, motion } from "framer-motion"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
+function getAuthHeaders() {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('saveit_token') : null
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  }
+}
+
 interface Note {
   _id: string
   text: string
@@ -42,7 +50,9 @@ export default function BoardPage() {
   const fetchNotes = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${API_BASE_URL}/notes`)
+      const response = await fetch(`${API_BASE_URL}/notes`, {
+        headers: getAuthHeaders()
+      })
       const result = await response.json()
       const fetchedNotes = result.success ? result.data : []
       setNotes(fetchedNotes)
@@ -83,7 +93,7 @@ export default function BoardPage() {
 
       const response = await fetch(`${API_BASE_URL}/notes`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           text: '',
           color: color,
@@ -124,7 +134,7 @@ export default function BoardPage() {
 
       const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(updates)
       })
 
@@ -143,7 +153,10 @@ export default function BoardPage() {
 
   const deleteNote = async (id: string) => {
     try {
-      await fetch(`${API_BASE_URL}/notes/${id}`, { method: 'DELETE' })
+      await fetch(`${API_BASE_URL}/notes/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      })
       setNotes(notes.filter(note => note._id !== id))
       toast({
         title: "🗑️ Deleted",
