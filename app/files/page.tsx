@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import { CreateIndustryDialog } from "@/components/create-industry-dialog"
+import { getAuthHeaders } from "@/lib/auth-headers"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
@@ -50,7 +51,9 @@ export default function FilesPage() {
 
   const fetchIndustries = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/industries`)
+      const response = await fetch(`${API_BASE_URL}/industries`, {
+        headers: getAuthHeaders()
+      })
       const result = await response.json()
       if (result.success) {
         setIndustries(result.data)
@@ -68,7 +71,9 @@ export default function FilesPage() {
         url += `?industry=${selectedIndustry}`
       }
 
-      const response = await fetch(url)
+      const response = await fetch(url, {
+        headers: getAuthHeaders()
+      })
       const result = await response.json()
       if (result.success) {
         setFiles(result.data)
@@ -166,7 +171,7 @@ export default function FilesPage() {
       const response = await fetch(`${API_BASE_URL}/files/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          ...(token && { 'Authorization': `Bearer ${token}` })
         },
         body: formData
       })
@@ -201,7 +206,8 @@ export default function FilesPage() {
   const handleDeleteFile = async (id: string) => {
     try {
       await fetch(`${API_BASE_URL}/files/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       })
       setFiles(files.filter(f => f._id !== id))
       fetchIndustries()
@@ -223,7 +229,8 @@ export default function FilesPage() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/industries/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       })
       const result = await response.json()
 

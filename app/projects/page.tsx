@@ -10,6 +10,7 @@ import { ProjectCard } from "@/components/project-card"
 import { OrganizationCard } from "@/components/organization-card"
 import { CreateProjectDialog } from "@/components/create-project-dialog"
 import { CreateOrganizationDialog } from "@/components/create-organization-dialog"
+import { getAuthHeaders } from "@/lib/auth-headers"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
@@ -60,7 +61,9 @@ export default function ProjectsPage() {
 
   const fetchOrganizations = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/organizations`)
+      const response = await fetch(`${API_BASE_URL}/organizations`, {
+        headers: getAuthHeaders()
+      })
       const result = await response.json()
       if (result.success) {
         setOrganizations(result.data)
@@ -87,7 +90,9 @@ export default function ProjectsPage() {
         url += `?${params.toString()}`
       }
 
-      const response = await fetch(url)
+      const response = await fetch(url, {
+        headers: getAuthHeaders()
+      })
       const result = await response.json()
       if (result.success) {
         setProjects(result.data)
@@ -131,7 +136,8 @@ export default function ProjectsPage() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/organizations/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       })
       const result = await response.json()
 
@@ -165,7 +171,8 @@ export default function ProjectsPage() {
   const handleDeleteProject = async (id: string) => {
     try {
       await fetch(`${API_BASE_URL}/projects/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       })
       setProjects(projects.filter(p => p._id !== id))
       fetchOrganizations()
@@ -186,7 +193,7 @@ export default function ProjectsPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/projects/${projectId}/move`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ organizationId })
       })
       const result = await response.json()
