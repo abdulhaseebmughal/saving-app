@@ -29,13 +29,26 @@ export function PWARegister() {
 
       // Listen for the beforeinstallprompt event
       const handleBeforeInstallPrompt = (e: any) => {
+        console.log('🎯 beforeinstallprompt event fired')
         e.preventDefault()
         setDeferredPrompt(e)
 
         // Check if user has already dismissed the prompt
         const dismissed = localStorage.getItem('pwa-install-dismissed')
-        if (!dismissed) {
-          setShowInstallPrompt(true)
+        const dismissedTime = localStorage.getItem('pwa-install-dismissed-time')
+
+        // Show again after 7 days if dismissed
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000)
+        const shouldShowAgain = !dismissed || (dismissedTime && parseInt(dismissedTime) < sevenDaysAgo)
+
+        if (shouldShowAgain) {
+          console.log('📱 Showing PWA install prompt')
+          // Show after 3 seconds for better UX
+          setTimeout(() => {
+            setShowInstallPrompt(true)
+          }, 3000)
+        } else {
+          console.log('❌ PWA install prompt dismissed by user')
         }
       }
 
@@ -46,7 +59,14 @@ export function PWARegister() {
         console.log('✅ PWA installed successfully')
         setShowInstallPrompt(false)
         setDeferredPrompt(null)
+        localStorage.removeItem('pwa-install-dismissed')
+        localStorage.removeItem('pwa-install-dismissed-time')
       })
+
+      // Check if already installed
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('✅ App is running in standalone mode (already installed)')
+      }
 
       return () => {
         window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -72,6 +92,8 @@ export function PWARegister() {
   const handleDismiss = () => {
     setShowInstallPrompt(false)
     localStorage.setItem('pwa-install-dismissed', 'true')
+    localStorage.setItem('pwa-install-dismissed-time', Date.now().toString())
+    console.log('❌ PWA install prompt dismissed')
   }
 
   if (!showInstallPrompt) return null
