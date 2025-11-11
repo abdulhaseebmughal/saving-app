@@ -70,17 +70,33 @@ export default function AdminPage() {
   const fetchDashboardData = async () => {
     try {
       console.log('Fetching dashboard from:', `${API_BASE_URL}/admin/dashboard`)
+      console.log('Sending headers:', { email: ADMIN_EMAIL, password: '***' })
 
       const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+        method: 'GET',
+        mode: 'cors',
         headers: {
+          'Content-Type': 'application/json',
           'email': ADMIN_EMAIL,
           'password': ADMIN_PASSWORD
         }
       })
 
       console.log('Response status:', response.status)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+
       const result = await response.json()
       console.log('Dashboard result:', result)
+
+      if (response.status === 401) {
+        console.error('Authentication failed:', result)
+        toast({
+          title: "Authentication Failed",
+          description: result.error || "Invalid admin credentials",
+          variant: "destructive"
+        })
+        return
+      }
 
       if (result.success) {
         console.log('Setting data:', {
@@ -102,6 +118,7 @@ export default function AdminPage() {
           description: `Loaded ${result.stats.totalUsers} users and ${result.stats.totalItems} items`,
         })
       } else {
+        console.error('API returned error:', result)
         toast({
           title: "Error",
           description: result.error || "Failed to load dashboard data",
@@ -155,7 +172,9 @@ export default function AdminPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/admin/${collection}/${id}`, {
         method: 'DELETE',
+        mode: 'cors',
         headers: {
+          'Content-Type': 'application/json',
           'email': ADMIN_EMAIL,
           'password': ADMIN_PASSWORD
         }
@@ -168,6 +187,12 @@ export default function AdminPage() {
           description: "Item deleted successfully"
         })
         fetchDashboardData()
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to delete item",
+          variant: "destructive"
+        })
       }
     } catch (error) {
       toast({
