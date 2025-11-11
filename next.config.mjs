@@ -9,6 +9,24 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https: chrome-extension:",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://saving-app-backend-six.vercel.app https://*.vercel.app wss: ws:",
+              "frame-src 'self' https:",
+              "worker-src 'self' blob:",
+            ].join('; ')
+          },
+        ],
+      },
+      {
         source: '/sw.js',
         headers: [
           {
