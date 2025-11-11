@@ -47,8 +47,16 @@ export default function AdminPage() {
     totalProjects: 0,
     totalFiles: 0,
     totalOrganizations: 0,
-    totalIndustries: 0
+    totalIndustries: 0,
+    adminItems: 0,
+    adminNotes: 0,
+    adminDiaryNotes: 0,
+    adminProjects: 0,
+    adminFiles: 0,
+    adminOrganizations: 0,
+    adminIndustries: 0
   })
+  const [adminData, setAdminData] = useState<DatabaseData | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -72,6 +80,7 @@ export default function AdminPage() {
       if (result.success) {
         setData(result.data)
         setStats(result.stats)
+        setAdminData(result.adminData)
       }
     } catch (error) {
       console.error('Error fetching dashboard:', error)
@@ -317,7 +326,51 @@ export default function AdminPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Stats Grid */}
+        {/* Admin Personal Stats */}
+        {adminData && (
+          <div className="mb-6">
+            <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              Your Personal Data
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-blue-500">{stats.adminItems}</div>
+                <div className="text-xs text-muted-foreground">Saved Links</div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-purple-500">{stats.adminNotes}</div>
+                <div className="text-xs text-muted-foreground">Sticky Notes</div>
+              </div>
+              <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-pink-500">{stats.adminDiaryNotes}</div>
+                <div className="text-xs text-muted-foreground">Diary Notes</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-green-500">{stats.adminProjects}</div>
+                <div className="text-xs text-muted-foreground">Projects</div>
+              </div>
+              <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-orange-500">{stats.adminFiles}</div>
+                <div className="text-xs text-muted-foreground">Files</div>
+              </div>
+              <div className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 border border-cyan-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-cyan-500">{stats.adminOrganizations}</div>
+                <div className="text-xs text-muted-foreground">Organizations</div>
+              </div>
+              <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/20 rounded-lg p-3">
+                <div className="text-2xl font-bold text-yellow-500">{stats.adminIndustries}</div>
+                <div className="text-xs text-muted-foreground">Industries</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* All Users Stats */}
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+          <Database className="w-5 h-5 text-primary" />
+          All Users Database
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {tabs.map((tab) => (
             <motion.div
