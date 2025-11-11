@@ -203,24 +203,43 @@ export default function FilesPage() {
     }
   }
 
-  const handleDownloadFile = (file: FileItem) => {
-    // For now, we'll create a simple text file with file info since actual files aren't stored
-    // In production with cloud storage, you'd fetch the actual file from S3/Cloudinary
-    const fileInfo = `File: ${file.name}\nSize: ${formatFileSize(file.size)}\nType: ${file.type}\nCategory: ${file.category}\nUploaded: ${new Date(file.uploadedAt).toLocaleString()}`
-    const blob = new Blob([fileInfo], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${file.name}.info.txt`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+  const handleDownloadFile = async (file: FileItem) => {
+    try {
+      const token = localStorage.getItem('saveit_token')
+      const response = await fetch(`${API_BASE_URL}/files/${file._id}/download`, {
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      })
 
-    toast({
-      title: "Download",
-      description: "File info downloaded (metadata only)"
-    })
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+
+      // Get the file blob
+      const blob = await response.blob()
+
+      // Create download link
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = file.name
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      toast({
+        title: "Downloaded",
+        description: `${file.name} downloaded successfully`
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to download file",
+        variant: "destructive"
+      })
+    }
   }
 
   const handleDeleteFile = async (id: string) => {
