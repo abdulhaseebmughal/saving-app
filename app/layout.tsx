@@ -41,11 +41,11 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <PWARegister />
         <AuthProvider>
+          <AdminShortcut />
           <AuthGuard>
             <Navbar />
             <main className="min-h-screen bg-background">{children}</main>
           </AuthGuard>
-<AdminShortcut />
           <Toaster />
         </AuthProvider>
       </body>

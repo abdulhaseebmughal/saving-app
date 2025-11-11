@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { getAuthHeaders } from "@/lib/auth-headers"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
@@ -34,7 +35,7 @@ export function CreateOrganizationDialog({ open, onClose, onSuccess }: CreateOrg
     try {
       const response = await fetch(`${API_BASE_URL}/organizations`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ name, description, icon, color })
       })
 

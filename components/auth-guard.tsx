@@ -11,7 +11,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Public routes that don't require authentication
-    const publicRoutes = ['/login', '/signup', '/forgot-password']
+    const publicRoutes = ['/login', '/signup', '/forgot-password', '/admin']
 
     if (!user && !publicRoutes.includes(pathname)) {
       router.push('/login')
@@ -19,7 +19,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [user, router, pathname])
 
   // If on public route or user is authenticated, render children
-  const publicRoutes = ['/login', '/signup', '/forgot-password']
+  const publicRoutes = ['/login', '/signup', '/forgot-password', '/admin']
   if (publicRoutes.includes(pathname) || user) {
     return <>{children}</>
   }

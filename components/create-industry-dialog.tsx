@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { FolderOpen, Palette } from "lucide-react"
+import { getAuthHeaders } from "@/lib/auth-headers"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
@@ -60,10 +61,7 @@ export function CreateIndustryDialog({ open, onClose, onSuccess }: CreateIndustr
     try {
       const response = await fetch(`${API_BASE_URL}/industries`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('saveit_token')}`
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim(),
