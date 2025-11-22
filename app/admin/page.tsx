@@ -6,6 +6,7 @@ import { Shield, Users, Database, Mail, Key, LogOut, Trash2, RefreshCw, FileText
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import Loader from "@/components/loader"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
@@ -28,6 +29,7 @@ export default function AdminPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isFetchingData, setIsFetchingData] = useState(false)
   const [activeTab, setActiveTab] = useState("users")
   const [data, setData] = useState<DatabaseData>({
     users: [],
@@ -68,6 +70,7 @@ export default function AdminPage() {
   }, [])
 
   const fetchDashboardData = async () => {
+    setIsFetchingData(true)
     try {
       const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
         headers: {
@@ -129,6 +132,8 @@ export default function AdminPage() {
         description: "Failed to load dashboard data",
         variant: "destructive"
       })
+    } finally {
+      setIsFetchingData(false)
     }
   }
 
@@ -338,7 +343,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      {isFetchingData && <Loader />}
+      <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -474,5 +481,6 @@ export default function AdminPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
