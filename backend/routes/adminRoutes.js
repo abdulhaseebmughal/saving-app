@@ -24,14 +24,26 @@ const ADMIN_PASSWORD = 'Haseebkhan19006';
  */
 const adminAuth = (req, res, next) => {
   try {
-    // Get credentials from body OR headers OR query params
-    const email = req.body?.email || req.query?.email || req.headers.email || req.headers['email'];
-    const password = req.body?.password || req.query?.password || req.headers.password || req.headers['password'];
+    // Get credentials from body OR headers OR query params (case insensitive for headers)
+    const email = req.body?.email ||
+                  req.query?.email ||
+                  req.headers.email ||
+                  req.headers['email'] ||
+                  req.headers.Email ||
+                  req.headers['Email'];
+
+    const password = req.body?.password ||
+                     req.query?.password ||
+                     req.headers.password ||
+                     req.headers['password'] ||
+                     req.headers.Password ||
+                     req.headers['Password'];
 
     console.log('Admin auth attempt:', {
-      email: email ? '***' : 'missing',
-      password: password ? '***' : 'missing',
-      source: req.body?.email ? 'body' : (req.query?.email ? 'query' : (req.headers.email ? 'headers' : 'none'))
+      email: email ? email : 'MISSING',
+      password: password ? '***' : 'MISSING',
+      allHeaders: Object.keys(req.headers),
+      source: req.body?.email ? 'body' : (req.query?.email ? 'query' : 'headers')
     });
 
     if (!email || !password) {
