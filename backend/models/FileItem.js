@@ -18,6 +18,11 @@ const fileItemSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // Store actual file content as base64
+  content: {
+    type: String,
+    required: true
+  },
   size: {
     type: Number,
     required: true

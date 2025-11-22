@@ -5,6 +5,9 @@ const FileItem = require('../models/FileItem');
 const Industry = require('../models/Industry');
 const authMiddleware = require('../middleware/authMiddleware');
 
+// All routes protected with auth
+router.use(authMiddleware);
+
 // Configure multer for file uploads (memory storage for serverless)
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -15,10 +18,10 @@ const upload = multer({
 });
 
 // GET /api/files
-router.get('/files', authMiddleware, async (req, res) => {
+router.get('/files', async (req, res) => {
   try {
     const { industry } = req.query;
-    const filter = {};
+    const filter = { userId: req.user.userId };
 
     if (industry) {
       if (industry === 'null' || industry === 'none') {
@@ -42,8 +45,10 @@ router.get('/files', authMiddleware, async (req, res) => {
 // GET /api/files/:id
 router.get('/files/:id', async (req, res) => {
   try {
-    const file = await FileItem.findById(req.params.id)
-      .populate('industry', 'name icon color');
+    const file = await FileItem.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    }).populate('industry', 'name icon color');
 
     if (!file) {
       return res.status(404).json({ success: false, error: 'File not found' });
@@ -60,7 +65,7 @@ router.get('/files/:id', async (req, res) => {
 });
 
 // POST /api/files/upload
-router.post('/files/upload', authMiddleware, upload.array('files', 20), async (req, res) => {
+router.post('/files/upload', upload.array('files', 20), async (req, res) => {
   try {
     const files = req.files;
     const { industry } = req.body;
@@ -96,6 +101,7 @@ router.post('/files/upload', authMiddleware, upload.array('files', 20), async (r
       else if (file.originalname.match(/\.(js|jsx|ts|tsx|py|java|cpp|c|html|css|php|rb|go|rs)$/i)) category = 'code';
 
       const fileItem = new FileItem({
+        userId: req.user.userId,
         name: file.originalname,
         path: `/uploads/${Date.now()}-${file.originalname}`, // In production, upload to cloud and store URL
         size: file.size,
@@ -128,9 +134,12 @@ router.post('/files/upload', authMiddleware, upload.array('files', 20), async (r
 });
 
 // DELETE /api/files/:id
-router.delete('/files/:id', authMiddleware, async (req, res) => {
+router.delete('/files/:id', async (req, res) => {
   try {
-    const file = await FileItem.findById(req.params.id);
+    const file = await FileItem.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!file) {
       return res.status(404).json({ success: false, error: 'File not found' });
@@ -160,7 +169,10 @@ router.delete('/files/:id', authMiddleware, async (req, res) => {
 // POST /api/files/:id/move
 router.post('/files/:id/move', async (req, res) => {
   try {
-    const file = await FileItem.findById(req.params.id);
+    const file = await FileItem.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!file) {
       return res.status(404).json({ success: false, error: 'File not found' });

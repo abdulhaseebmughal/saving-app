@@ -12,6 +12,7 @@ const organizationRoutes = require('./routes/organizationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const industryRoutes = require('./routes/industryRoutes');
 const fileRoutes = require('./routes/fileRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -51,8 +52,9 @@ app.use(cors({
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'email', 'password', 'Email', 'Password'],
+  exposedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -128,6 +130,7 @@ app.use('/api', projectRoutes);
 app.use('/api', organizationRoutes);
 app.use('/api', industryRoutes);
 app.use('/api', fileRoutes);
+app.use('/api', adminRoutes);
 
 // 404 Handler - Must be after all routes
 app.use(notFoundHandler);

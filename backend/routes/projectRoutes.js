@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Project = require('../models/Project');
 const Organization = require('../models/Organization');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// All routes protected with auth
+router.use(authMiddleware);
 
 // Validation helper
 const validateProject = (data) => {
@@ -24,12 +28,12 @@ const validateProject = (data) => {
 };
 
 // @route   GET /api/projects
-// @desc    Get all projects (optionally filtered by organization)
-// @access  Public
+// @desc    Get all projects for current user (optionally filtered by organization)
+// @access  Private
 router.get('/projects', async (req, res) => {
   try {
     const { organization, type, status } = req.query;
-    const filter = {};
+    const filter = { userId: req.user.userId };
 
     if (organization) {
       if (organization === 'null' || organization === 'none') {
@@ -61,11 +65,13 @@ router.get('/projects', async (req, res) => {
 
 // @route   GET /api/projects/:id
 // @desc    Get single project
-// @access  Public
+// @access  Private
 router.get('/projects/:id', async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id)
-      .populate('organization', 'name color icon');
+    const project = await Project.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    }).populate('organization', 'name color icon');
 
     if (!project) {
       return res.status(404).json({
@@ -122,6 +128,7 @@ router.post('/projects', async (req, res) => {
     }
 
     const project = new Project({
+      userId: req.user.userId,
       name: req.body.name.trim(),
       description: req.body.description || '',
       type: req.body.type || 'other',
@@ -164,10 +171,13 @@ router.post('/projects', async (req, res) => {
 
 // @route   PUT /api/projects/:id
 // @desc    Update project
-// @access  Public
+// @access  Private
 router.put('/projects/:id', async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!project) {
       return res.status(404).json({
@@ -240,10 +250,13 @@ router.put('/projects/:id', async (req, res) => {
 
 // @route   DELETE /api/projects/:id
 // @desc    Delete project
-// @access  Public
+// @access  Private
 router.delete('/projects/:id', async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!project) {
       return res.status(404).json({
@@ -284,10 +297,13 @@ router.delete('/projects/:id', async (req, res) => {
 
 // @route   POST /api/projects/:id/move
 // @desc    Move project to organization
-// @access  Public
+// @access  Private
 router.post('/projects/:id/move', async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!project) {
       return res.status(404).json({

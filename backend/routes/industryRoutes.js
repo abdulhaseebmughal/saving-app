@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Industry = require('../models/Industry');
 const FileItem = require('../models/FileItem');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// All routes protected with auth
+router.use(authMiddleware);
 
 // Validation
 const validateIndustry = (data) => {
@@ -18,7 +22,7 @@ const validateIndustry = (data) => {
 // GET /api/industries
 router.get('/industries', async (req, res) => {
   try {
-    const industries = await Industry.find().sort({ position: 1, createdAt: -1 });
+    const industries = await Industry.find({ userId: req.user.userId }).sort({ position: 1, createdAt: -1 });
     res.json({ success: true, data: industries, count: industries.length });
   } catch (error) {
     console.error('Get industries error:', error);
@@ -29,7 +33,7 @@ router.get('/industries', async (req, res) => {
 // GET /api/industries/:id
 router.get('/industries/:id', async (req, res) => {
   try {
-    const industry = await Industry.findById(req.params.id);
+    const industry = await Industry.findOne({ _id: req.params.id, userId: req.user.userId });
     if (!industry) {
       return res.status(404).json({ success: false, error: 'Industry not found' });
     }
@@ -52,6 +56,7 @@ router.post('/industries', async (req, res) => {
     }
 
     const industry = new Industry({
+      userId: req.user.userId,
       name: req.body.name.trim(),
       description: req.body.description || '',
       icon: req.body.icon || '🏢',
@@ -70,7 +75,7 @@ router.post('/industries', async (req, res) => {
 // PUT /api/industries/:id
 router.put('/industries/:id', async (req, res) => {
   try {
-    const industry = await Industry.findById(req.params.id);
+    const industry = await Industry.findOne({ _id: req.params.id, userId: req.user.userId });
     if (!industry) {
       return res.status(404).json({ success: false, error: 'Industry not found' });
     }
@@ -100,7 +105,7 @@ router.put('/industries/:id', async (req, res) => {
 // DELETE /api/industries/:id
 router.delete('/industries/:id', async (req, res) => {
   try {
-    const industry = await Industry.findById(req.params.id);
+    const industry = await Industry.findOne({ _id: req.params.id, userId: req.user.userId });
     if (!industry) {
       return res.status(404).json({ success: false, error: 'Industry not found' });
     }

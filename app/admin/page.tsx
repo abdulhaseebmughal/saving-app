@@ -69,7 +69,13 @@ export default function AdminPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/dashboard`)
+      const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'email': ADMIN_EMAIL,
+          'password': ADMIN_PASSWORD
+        }
+      })
 
       console.log('Response status:', response.status)
       console.log('Response headers:', Object.fromEntries(response.headers.entries()))
@@ -84,6 +90,8 @@ export default function AdminPage() {
           description: result.error || "Invalid admin credentials",
           variant: "destructive"
         })
+        localStorage.removeItem('admin_authenticated')
+        setIsAuthenticated(false)
         return
       }
 
@@ -160,7 +168,12 @@ export default function AdminPage() {
 
     try {
       const response = await fetch(`${API_BASE_URL}/admin/${collection}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'email': ADMIN_EMAIL,
+          'password': ADMIN_PASSWORD
+        }
       })
 
       const result = await response.json()

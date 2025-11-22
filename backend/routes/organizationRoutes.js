@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Organization = require('../models/Organization');
 const Project = require('../models/Project');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// All routes protected with auth
+router.use(authMiddleware);
 
 // Validation helper
 const validateOrganization = (data) => {
@@ -16,11 +20,11 @@ const validateOrganization = (data) => {
 };
 
 // @route   GET /api/organizations
-// @desc    Get all organizations
-// @access  Public
+// @desc    Get all organizations for current user
+// @access  Private
 router.get('/organizations', async (req, res) => {
   try {
-    const organizations = await Organization.find()
+    const organizations = await Organization.find({ userId: req.user.userId })
       .sort({ position: 1, createdAt: -1 });
 
     res.json({
@@ -39,10 +43,13 @@ router.get('/organizations', async (req, res) => {
 
 // @route   GET /api/organizations/:id
 // @desc    Get single organization
-// @access  Public
+// @access  Private
 router.get('/organizations/:id', async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!organization) {
       return res.status(404).json({
@@ -84,6 +91,7 @@ router.post('/organizations', async (req, res) => {
     }
 
     const organization = new Organization({
+      userId: req.user.userId,
       name: req.body.name.trim(),
       description: req.body.description || '',
       color: req.body.color || '#6366f1',
@@ -108,10 +116,13 @@ router.post('/organizations', async (req, res) => {
 
 // @route   PUT /api/organizations/:id
 // @desc    Update organization
-// @access  Public
+// @access  Private
 router.put('/organizations/:id', async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!organization) {
       return res.status(404).json({
@@ -158,10 +169,13 @@ router.put('/organizations/:id', async (req, res) => {
 
 // @route   DELETE /api/organizations/:id
 // @desc    Delete organization
-// @access  Public
+// @access  Private
 router.delete('/organizations/:id', async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findOne({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
 
     if (!organization) {
       return res.status(404).json({
