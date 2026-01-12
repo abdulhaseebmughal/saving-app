@@ -1,33 +1,64 @@
 {
   "name": "SaveIt.AI - Smart AI-Powered Saving",
   "short_name": "SaveIt.AI",
-  "description": "Remember, organize, and learn from everything with AI",
+  "description": "Remember, organize, and learn from everything with AI. Your intelligent digital assistant for code, notes, and projects.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "background_color": "#000000",
   "theme_color": "#000000",
-  "orientation": "portrait-primary",
+  "orientation": "any",
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.jpg",
       "sizes": "192x192",
       "type": "image/jpeg",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["productivity", "utilities"],
+  "categories": ["productivity", "utilities", "development", "education"],
+  "screenshots": [
+    {
+      "src": "/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Save Note",
-      "short_name": "Note",
-      "description": "Quickly save a new note",
-      "url": "/?action=note",
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your dashboard",
+      "url": "/",
       "icons": [
         {
           "src": "/icon-192.jpg",
@@ -36,7 +67,43 @@
       ]
     },
     {
-      "name": "View Notes",
+      "name": "Projects",
+      "short_name": "Projects",
+      "description": "Manage your projects",
+      "url": "/projects",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Learning Hub",
+      "short_name": "Learning",
+      "description": "Track courses and learning progress",
+      "url": "/learning",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Code Components",
+      "short_name": "Code",
+      "description": "Browse code components",
+      "url": "/components",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Notes",
       "short_name": "Notes",
       "description": "View all your notes",
       "url": "/notes",
@@ -47,5 +114,7 @@
         }
       ]
     }
-  ]
+  ],
+  "related_applications": [],
+  "iarc_rating_id": ""
 }

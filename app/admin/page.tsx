@@ -73,11 +73,14 @@ export default function AdminPage() {
     setIsFetchingData(true)
     try {
       const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'email': ADMIN_EMAIL,
-          'password': ADMIN_PASSWORD
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        })
       })
 
       console.log('Response status:', response.status)
@@ -175,10 +178,12 @@ export default function AdminPage() {
       const response = await fetch(`${API_BASE_URL}/admin/${collection}/${id}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
-          'email': ADMIN_EMAIL,
-          'password': ADMIN_PASSWORD
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        })
       })
 
       const result = await response.json()
@@ -296,8 +301,8 @@ export default function AdminPage() {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Mail className="absolute left-3 pointer-events-none w-4 h-4 text-muted-foreground" />
                   <Input
                     type="email"
                     value={email}
@@ -311,8 +316,8 @@ export default function AdminPage() {
 
               <div>
                 <label className="text-sm font-medium mb-2 block">Password</label>
-                <div className="relative">
-                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Key className="absolute left-3 pointer-events-none w-4 h-4 text-muted-foreground" />
                   <Input
                     type="password"
                     value={password}

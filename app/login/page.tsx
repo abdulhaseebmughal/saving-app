@@ -39,24 +39,24 @@ export default function LoginPage() {
 
     setIsLoading(true)
 
-    try {
-      await requestLoginOTP(email)
+    const result = await requestLoginOTP(email)
+
+    if (result.success) {
       setStep('otp')
       toast({
         title: "OTP Sent!",
         description: "Check your email for the 6-digit OTP code",
         duration: 5000
       })
-    } catch (error: any) {
-      console.error('Login OTP request error:', error)
+    } else {
       toast({
         title: "Error",
-        description: error.message || "Failed to send OTP. Please try again.",
+        description: result.error || "Failed to send OTP. Please try again.",
         variant: "destructive"
       })
-    } finally {
-      setIsLoading(false)
     }
+
+    setIsLoading(false)
   }
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
@@ -73,22 +73,25 @@ export default function LoginPage() {
 
     setIsLoading(true)
 
-    try {
-      await login(email, otp)
+    console.log('Attempting login with:', { email, otp: otp.substring(0, 2) + '****' })
+    const result = await login(email, otp)
+    console.log('Login result:', result)
+
+    if (result.success) {
       toast({
         title: "Success!",
         description: "Login successful. Redirecting...",
       })
-    } catch (error: any) {
-      console.error('OTP verification error:', error)
+    } else {
+      console.error('Login failed:', result.error)
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid OTP. Please try again.",
+        description: result.error || "Invalid OTP. Please try again.",
         variant: "destructive"
       })
-    } finally {
-      setIsLoading(false)
     }
+
+    setIsLoading(false)
   }
 
   const handleResendOTP = async () => {
@@ -148,15 +151,15 @@ export default function LoginPage() {
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Mail className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-10"
                     disabled={isLoading}
                     autoFocus
                   />
@@ -196,15 +199,15 @@ export default function LoginPage() {
                 <label htmlFor="otp" className="block text-sm font-medium text-foreground mb-2">
                   OTP Code
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="otp"
                     type="text"
                     placeholder="Enter 6-digit OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="pl-10 text-center text-lg tracking-widest"
+                    className="pl-10 text-center text-lg tracking-widest h-12"
                     disabled={isLoading}
                     autoFocus
                     maxLength={6}

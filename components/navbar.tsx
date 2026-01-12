@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban, Upload, LogOut, Download, User } from "lucide-react"
+import { Sparkles, FileText, Code, Settings, Clipboard, Menu, X, FolderKanban, Upload, LogOut, Download, User, Package, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
@@ -67,9 +67,11 @@ export function Navbar() {
     { href: "/", label: "Dashboard", icon: Sparkles },
     { href: "/board", label: "Board", icon: Clipboard },
     { href: "/projects", label: "Projects", icon: FolderKanban },
+    { href: "/learning", label: "Learning", icon: GraduationCap },
     { href: "/files", label: "Files", icon: Upload },
     { href: "/notes", label: "Notes", icon: FileText },
     { href: "/components", label: "Components", icon: Code },
+    { href: "/packages", label: "Packages", icon: Package },
     { href: "/profile", label: "Profile", icon: User },
     { href: "/settings", label: "Settings", icon: Settings },
   ]

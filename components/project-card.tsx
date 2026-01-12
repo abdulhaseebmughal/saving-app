@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ExternalLink, Trash2, Move, MoreVertical, Github, Globe } from "lucide-react"
+import { ExternalLink, Trash2, Move, MoreVertical, Github, Globe, Square, Circle, Triangle, Layers, Hexagon, Code, Cpu, FolderOpen, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -43,15 +43,15 @@ interface ProjectCardProps {
   onUpdate: () => void
 }
 
-const TYPE_ICONS: Record<string, string> = {
-  vanilla: '🟨',
-  react: '⚛️',
-  nextjs: '▲',
-  vue: '💚',
-  angular: '🅰️',
-  node: '🟢',
-  python: '🐍',
-  other: '📁',
+const TYPE_ICONS: Record<string, any> = {
+  vanilla: Square,
+  react: Circle,
+  nextjs: Triangle,
+  vue: Layers,
+  angular: Hexagon,
+  node: Code,
+  python: Cpu,
+  other: FolderOpen,
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -64,7 +64,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate }: ProjectCardProps) {
   const [showMoveMenu, setShowMoveMenu] = useState(false)
 
-  const typeIcon = TYPE_ICONS[project.type] || '📁'
+  const TypeIcon = TYPE_ICONS[project.type] || FolderOpen
 
   return (
     <motion.div
@@ -77,7 +77,9 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-2xl flex-shrink-0">{project.icon || typeIcon}</span>
+            <div className="flex-shrink-0">
+              <TypeIcon className="w-6 h-6 text-primary" />
+            </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base text-foreground truncate">
                 {project.name}
@@ -198,7 +200,7 @@ export function ProjectCard({ project, organizations, onDelete, onMove, onUpdate
                     setShowMoveMenu(false)
                   }}
                 >
-                  <span className="mr-2">📦</span>
+                  <Package className="w-4 h-4 mr-2" />
                   No Organization
                 </Button>
                 {organizations.map((org) => (

@@ -139,14 +139,20 @@ export default function BoardPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to update')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || errorData.details || 'Failed to update note')
       }
 
       const result = await response.json()
       const updatedNote = result.success ? result.data : result
       setNotes(notes.map(note => note._id === id ? updatedNote : note))
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating note:', error)
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update note",
+        variant: "destructive"
+      })
       fetchNotes() // Revert on error
     }
   }
@@ -240,8 +246,8 @@ export default function BoardPage() {
               </div>
 
               {/* Search */}
-              <div className="relative flex-1 max-w-xs hidden md:block">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <div className="relative flex-1 max-w-xs hidden md:flex md:items-center">
+                <Search className="absolute left-2.5 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
                 <Input
                   type="text"
                   placeholder="Search notes..."
@@ -290,8 +296,8 @@ export default function BoardPage() {
 
           {/* Mobile Search */}
           <div className="md:hidden mt-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <div className="relative flex items-center">
+              <Search className="absolute left-2.5 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <Input
                 type="text"
                 placeholder="Search notes..."

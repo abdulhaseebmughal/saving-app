@@ -373,8 +373,8 @@ export default function FilesPage() {
           </div>
 
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="relative flex items-center">
+            <Search className="absolute left-3 w-4 h-4 text-muted-foreground pointer-events-none" />
             <Input
               type="text"
               placeholder="Search files..."
@@ -509,13 +509,15 @@ export default function FilesPage() {
               </div>
             </div>
           ) : filteredFiles.length === 0 ? (
-            <div className="flex items-center justify-center py-20 border-2 border-dashed border-border rounded-lg">
+            <div className="flex items-center justify-center min-h-[400px] py-20 border-2 border-dashed border-border rounded-lg">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center space-y-4 max-w-md px-4"
               >
-                <FolderOpen className="w-16 h-16 mx-auto text-muted-foreground" />
+                <div className="flex justify-center">
+                  <FolderOpen className="w-16 h-16 text-muted-foreground" />
+                </div>
                 <h2 className="text-xl font-bold text-foreground">
                   {searchQuery ? "No files found" : "No files yet"}
                 </h2>

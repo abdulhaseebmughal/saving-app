@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Plus, Folder, FolderOpen, Trash2, Search, Grid3x3 } from "lucide-react"
+import { Plus, Folder, FolderOpen, Trash2, Search, Grid3x3, Package, Square, Circle, Triangle, Layers, Code, Cpu, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -223,13 +223,13 @@ export default function ProjectsPage() {
   }
 
   const PROJECT_TYPES = [
-    { value: '', label: 'All', icon: '📦' },
-    { value: 'vanilla', label: 'Vanilla', icon: '🟨' },
-    { value: 'react', label: 'React', icon: '⚛️' },
-    { value: 'nextjs', label: 'Next.js', icon: '▲' },
-    { value: 'vue', label: 'Vue', icon: '💚' },
-    { value: 'node', label: 'Node', icon: '🟢' },
-    { value: 'python', label: 'Python', icon: '🐍' },
+    { value: '', label: 'All', icon: Package },
+    { value: 'vanilla', label: 'Vanilla', icon: Square },
+    { value: 'react', label: 'React', icon: Circle },
+    { value: 'nextjs', label: 'Next.js', icon: Triangle },
+    { value: 'vue', label: 'Vue', icon: Layers },
+    { value: 'node', label: 'Node', icon: Code },
+    { value: 'python', label: 'Python', icon: Cpu },
   ]
 
   return (
@@ -268,8 +268,8 @@ export default function ProjectsPage() {
 
           {/* Search and Filters */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative flex-1 flex items-center">
+              <Search className="absolute left-3 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
                 type="text"
                 placeholder="Search projects..."
@@ -279,20 +279,23 @@ export default function ProjectsPage() {
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {PROJECT_TYPES.map((type) => (
-                <button
-                  key={type.value}
-                  onClick={() => setTypeFilter(type.value)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap border ${
-                    typeFilter === type.value
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <span>{type.icon}</span>
-                  <span className="hidden sm:inline">{type.label}</span>
-                </button>
-              ))}
+              {PROJECT_TYPES.map((type) => {
+                const Icon = type.icon
+                return (
+                  <button
+                    key={type.value}
+                    onClick={() => setTypeFilter(type.value)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap border ${
+                      typeFilter === type.value
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background border-input hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{type.label}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -312,7 +315,9 @@ export default function ProjectsPage() {
                     : 'border-border hover:border-muted-foreground'
                 }`}
               >
-                <div className="text-2xl mb-2">📦</div>
+                <div className="flex items-center justify-center mb-2">
+                  <Package className="w-8 h-8 text-primary" />
+                </div>
                 <div className="text-sm font-medium text-foreground">All Projects</div>
                 <div className="text-xs text-muted-foreground">{projects.length}</div>
               </button>
@@ -359,8 +364,12 @@ export default function ProjectsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center space-y-4 max-w-md px-4"
               >
-                <div className="text-6xl">
-                  {searchQuery ? "🔍" : "📁"}
+                <div className="flex items-center justify-center mb-4">
+                  {searchQuery ? (
+                    <Search className="w-16 h-16 text-muted-foreground" />
+                  ) : (
+                    <FolderOpen className="w-16 h-16 text-muted-foreground" />
+                  )}
                 </div>
                 <h2 className="text-xl font-bold text-foreground">
                   {searchQuery ? "No projects found" : "No projects yet"}

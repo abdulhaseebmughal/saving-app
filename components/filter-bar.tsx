@@ -52,8 +52,8 @@ export function FilterBar({ currentFilter, onFilterChange, searchQuery, onSearch
         </div>
 
         {/* Search Input */}
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-full sm:w-64 flex items-center">
+          <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             type="text"
             placeholder="Search items..."

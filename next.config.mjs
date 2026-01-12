@@ -6,6 +6,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Optimize font loading to prevent preload warnings
+  optimizeFonts: true,
+  experimental: {
+    optimizeCss: true,
+  },
   async headers() {
     return [
       {
@@ -15,14 +20,15 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https: chrome-extension: blob:",
-              "script-src-elem 'self' 'unsafe-inline' https: chrome-extension: blob:",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https: blob:",
-              "font-src 'self' data:",
-              "connect-src 'self' https://saving-app-backend-six.vercel.app https://*.vercel.app https://www.google-analytics.com https://analytics.google.com wss: ws:",
-              "frame-src 'self' https:",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https: http://localhost:* chrome-extension://* blob:",
+              "script-src-elem 'self' 'unsafe-inline' https: http://localhost:* chrome-extension://* blob:",
+              "style-src 'self' 'unsafe-inline' https: http://localhost:* blob:",
+              "img-src 'self' data: https: http://localhost:* blob:",
+              "font-src 'self' data: https: http://localhost:* blob:",
+              "connect-src 'self' http://localhost:* https://saving-app-backend-six.vercel.app https://*.vercel.app https://www.google-analytics.com https://analytics.google.com wss: ws:",
+              "frame-src 'self' https: http://localhost:* chrome-extension://*",
               "worker-src 'self' blob:",
+              "manifest-src 'self'",
             ].join('; ')
           },
         ],

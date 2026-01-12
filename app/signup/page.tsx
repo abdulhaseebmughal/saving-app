@@ -165,15 +165,15 @@ export default function SignupPage() {
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   Name
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <User className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="name"
                     type="text"
                     placeholder="Enter your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-10"
                     disabled={isLoading}
                     autoFocus
                   />
@@ -184,15 +184,15 @@ export default function SignupPage() {
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                   Email
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Mail className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-10"
                     disabled={isLoading}
                   />
                 </div>
@@ -202,15 +202,15 @@ export default function SignupPage() {
                 <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                   Password
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="password"
                     type="password"
                     placeholder="At least 6 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-10"
                     disabled={isLoading}
                   />
                 </div>
@@ -244,15 +244,15 @@ export default function SignupPage() {
                 <label htmlFor="otp" className="block text-sm font-medium text-foreground mb-2">
                   OTP Code
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="otp"
                     type="text"
                     placeholder="Enter 6-digit OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="pl-10 text-center text-lg tracking-widest"
+                    className="pl-10 text-center text-lg tracking-widest h-12"
                     disabled={isLoading}
                     autoFocus
                     maxLength={6}

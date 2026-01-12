@@ -150,3 +150,196 @@
 .font-handwriting {
   font-family: var(--font-handwriting);
 }
+
+/* Modal and popup centering improvements */
+[data-radix-portal] {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-radix-portal] > * {
+  pointer-events: auto;
+}
+
+/* Perfect centering for all dialog modals */
+[role="dialog"] {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+/* Ensure modals stay within viewport on mobile */
+@media (max-width: 640px) {
+  [role="dialog"] {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 2rem) !important;
+  }
+}
+
+/* Better scrolling for modal content */
+[role="dialog"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+
+/* Smooth animations for all popups - preserve centering during animation */
+[data-state="open"][role="dialog"] {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+
+[data-state="closed"][role="dialog"] {
+  animation-duration: 150ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+
+/* Ensure animations don't break centering */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+/* PWA and Mobile Optimizations */
+
+/* Prevent pull-to-refresh on PWA */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+
+  /* Adjust navbar for safe areas */
+  nav {
+    padding-left: max(1rem, calc(1rem + env(safe-area-inset-left)));
+    padding-right: max(1rem, calc(1rem + env(safe-area-inset-right)));
+  }
+}
+
+/* Touch optimization */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets on touch devices */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on double tap */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Smooth scrolling for better mobile UX */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize for standalone PWA mode */
+@media (display-mode: standalone) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Allow text selection in inputs */
+  input,
+  textarea,
+  [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+/* Mobile viewport height fix */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Better mobile keyboard handling */
+@media (max-width: 768px) {
+  input:focus,
+  textarea:focus,
+  select:focus {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 896px) and (orientation: landscape) {
+  .min-h-screen {
+    min-height: 100vh;
+  }
+}
+
+/* High DPI/Retina optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  * {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode color scheme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Light mode color scheme */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    color-scheme: light;
+  }
+}

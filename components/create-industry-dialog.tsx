@@ -5,24 +5,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
-import { FolderOpen, Palette } from "lucide-react"
+import { FolderOpen, Palette, Briefcase, Building2, Paintbrush, Laptop, Smartphone, GraduationCap, Hospital, ShoppingBag, UtensilsCrossed, Plane, Zap } from "lucide-react"
 import { getAuthHeaders } from "@/lib/auth-headers"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
 const INDUSTRY_ICONS = [
-  { icon: <FolderOpen className="h-5 w-5" />, value: "folder" },
-  { icon: "💼", value: "briefcase" },
-  { icon: "🏢", value: "building" },
-  { icon: "🎨", value: "art" },
-  { icon: "💻", value: "tech" },
-  { icon: "📱", value: "mobile" },
-  { icon: "🎓", value: "education" },
-  { icon: "🏥", value: "health" },
-  { icon: "🏪", value: "retail" },
-  { icon: "🍔", value: "food" },
-  { icon: "✈️", value: "travel" },
-  { icon: "⚡", value: "energy" },
+  { icon: FolderOpen, value: "folder" },
+  { icon: Briefcase, value: "briefcase" },
+  { icon: Building2, value: "building" },
+  { icon: Paintbrush, value: "art" },
+  { icon: Laptop, value: "tech" },
+  { icon: Smartphone, value: "mobile" },
+  { icon: GraduationCap, value: "education" },
+  { icon: Hospital, value: "health" },
+  { icon: ShoppingBag, value: "retail" },
+  { icon: UtensilsCrossed, value: "food" },
+  { icon: Plane, value: "travel" },
+  { icon: Zap, value: "energy" },
 ]
 
 const COLORS = [
@@ -145,23 +145,24 @@ export function CreateIndustryDialog({ open, onClose, onSuccess }: CreateIndustr
               Icon
             </label>
             <div className="grid grid-cols-6 gap-2">
-              {INDUSTRY_ICONS.map((item) => (
-                <button
-                  key={item.value}
-                  type="button"
-                  onClick={() => setSelectedIcon(item.value)}
-                  className={`p-2 rounded-md border-2 transition-colors ${
-                    selectedIcon === item.value
-                      ? 'border-primary bg-accent'
-                      : 'border-border hover:border-muted-foreground'
-                  }`}
-                  disabled={isSubmitting}
-                >
-                  <div className="text-xl flex items-center justify-center">
-                    {typeof item.icon === 'string' ? item.icon : item.icon}
-                  </div>
-                </button>
-              ))}
+              {INDUSTRY_ICONS.map((item) => {
+                const Icon = item.icon
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setSelectedIcon(item.value)}
+                    className={`p-2 rounded-md border-2 transition-colors flex items-center justify-center ${
+                      selectedIcon === item.value
+                        ? 'border-primary bg-accent'
+                        : 'border-border hover:border-muted-foreground'
+                    }`}
+                    disabled={isSubmitting}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </button>
+                )
+              })}
             </div>
           </div>
 

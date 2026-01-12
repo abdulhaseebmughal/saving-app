@@ -8,10 +8,24 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { getAuthHeaders } from "@/lib/auth-headers"
+import { Building2, Landmark, Store, Factory, Construction, Home, Target, Zap, Rocket, Briefcase, FolderOpen, Wrench } from "lucide-react"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
-const ORG_ICONS = ['🏢', '🏛️', '🏬', '🏭', '🏗️', '🏠', '🎯', '⚡', '🚀', '💼', '📁', '🔧']
+const ORG_ICONS = [
+  { icon: Building2, value: 'building2' },
+  { icon: Landmark, value: 'landmark' },
+  { icon: Store, value: 'store' },
+  { icon: Factory, value: 'factory' },
+  { icon: Construction, value: 'construction' },
+  { icon: Home, value: 'home' },
+  { icon: Target, value: 'target' },
+  { icon: Zap, value: 'zap' },
+  { icon: Rocket, value: 'rocket' },
+  { icon: Briefcase, value: 'briefcase' },
+  { icon: FolderOpen, value: 'folder' },
+  { icon: Wrench, value: 'wrench' },
+]
 const ORG_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#14b8a6']
 
 interface CreateOrganizationDialogProps {
@@ -23,7 +37,7 @@ interface CreateOrganizationDialogProps {
 export function CreateOrganizationDialog({ open, onClose, onSuccess }: CreateOrganizationDialogProps) {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [icon, setIcon] = useState("🏢")
+  const [icon, setIcon] = useState("building2")
   const [color, setColor] = useState("#6366f1")
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -43,14 +57,14 @@ export function CreateOrganizationDialog({ open, onClose, onSuccess }: CreateOrg
 
       if (result.success) {
         toast({
-          title: "✅ Created!",
+          title: "Created!",
           description: "Organization created successfully"
         })
         onSuccess()
         onClose()
         setName("")
         setDescription("")
-        setIcon("🏢")
+        setIcon("building2")
         setColor("#6366f1")
       } else {
         toast({
@@ -105,18 +119,21 @@ export function CreateOrganizationDialog({ open, onClose, onSuccess }: CreateOrg
           <div>
             <Label>Icon</Label>
             <div className="grid grid-cols-6 gap-2 mt-1">
-              {ORG_ICONS.map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setIcon(i)}
-                  className={`text-2xl p-2 rounded-lg border-2 transition-all ${
-                    icon === i ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950' : 'border-gray-200 dark:border-gray-700'
-                  }`}
-                >
-                  {i}
-                </button>
-              ))}
+              {ORG_ICONS.map((item) => {
+                const Icon = item.icon
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setIcon(item.value)}
+                    className={`p-2 rounded-lg border-2 transition-all flex items-center justify-center ${
+                      icon === item.value ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950' : 'border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </button>
+                )
+              })}
             </div>
           </div>
 

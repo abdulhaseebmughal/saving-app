@@ -99,43 +99,82 @@ export function PWARegister() {
   if (!showInstallPrompt) return null
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-50 animate-in slide-in-from-bottom-5">
-      <div className="bg-gradient-to-r from-primary/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-border rounded-lg shadow-2xl p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-              <Download className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="font-bold text-foreground">Install SaveIt.AI</h3>
-              <p className="text-xs text-muted-foreground">Quick access from your home screen</p>
-            </div>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={handleDismiss}
+      />
+      <div className="relative bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl p-5 w-full max-w-md mx-4 sm:mx-auto animate-in zoom-in-95 duration-200">
+        {/* Close button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-2 h-8 w-8 rounded-full hover:bg-background/50"
+          onClick={handleDismiss}
+        >
+          <X className="w-4 h-4" />
+          <span className="sr-only">Close</span>
+        </Button>
+
+        {/* Icon and title */}
+        <div className="flex flex-col items-center text-center mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-purple-600 to-pink-500 flex items-center justify-center mb-3 shadow-lg">
+            <Download className="w-8 h-8 text-white animate-pulse" />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 -mr-2 -mt-2"
-            onClick={handleDismiss}
-          >
-            <X className="w-4 h-4" />
-          </Button>
+          <h3 className="text-xl font-bold text-foreground mb-1">
+            Install SaveIt.AI
+          </h3>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Get quick access from your home screen. Works offline and loads instantly.
+          </p>
         </div>
 
-        <div className="flex gap-2">
+        {/* Features list */}
+        <div className="space-y-2 mb-4 bg-background/30 rounded-lg p-3">
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs">✓</span>
+            </div>
+            <span className="text-muted-foreground">Works offline</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs">✓</span>
+            </div>
+            <span className="text-muted-foreground">Instant loading</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs">✓</span>
+            </div>
+            <span className="text-muted-foreground">No app store needed</span>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             onClick={handleInstallClick}
-            className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+            className="flex-1 bg-gradient-to-r from-primary via-purple-600 to-pink-500 hover:opacity-90 transition-opacity text-white font-semibold shadow-lg"
+            size="lg"
           >
-            Install Now
+            <Download className="w-4 h-4 mr-2" />
+            Install App
           </Button>
           <Button
             variant="outline"
             onClick={handleDismiss}
-            className="flex-1"
+            className="flex-1 border-border/50 hover:bg-background/50"
+            size="lg"
           >
-            Not Now
+            Maybe Later
           </Button>
         </div>
+
+        {/* Small print */}
+        <p className="text-xs text-center text-muted-foreground/60 mt-3">
+          Free to install • No signup required
+        </p>
       </div>
     </div>
   )

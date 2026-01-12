@@ -9,18 +9,19 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { getAuthHeaders } from "@/lib/auth-headers"
+import { Square, Circle, Triangle, Layers, Hexagon, Code, Cpu, FolderOpen } from "lucide-react"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api'
 
 const PROJECT_TYPES = [
-  { value: 'vanilla', label: 'Vanilla JS', icon: '🟨' },
-  { value: 'react', label: 'React', icon: '⚛️' },
-  { value: 'nextjs', label: 'Next.js', icon: '▲' },
-  { value: 'vue', label: 'Vue', icon: '💚' },
-  { value: 'angular', label: 'Angular', icon: '🅰️' },
-  { value: 'node', label: 'Node.js', icon: '🟢' },
-  { value: 'python', label: 'Python', icon: '🐍' },
-  { value: 'other', label: 'Other', icon: '📁' },
+  { value: 'vanilla', label: 'Vanilla JS', icon: Square },
+  { value: 'react', label: 'React', icon: Circle },
+  { value: 'nextjs', label: 'Next.js', icon: Triangle },
+  { value: 'vue', label: 'Vue', icon: Layers },
+  { value: 'angular', label: 'Angular', icon: Hexagon },
+  { value: 'node', label: 'Node.js', icon: Code },
+  { value: 'python', label: 'Python', icon: Cpu },
+  { value: 'other', label: 'Other', icon: FolderOpen },
 ]
 
 interface CreateProjectDialogProps {
@@ -62,7 +63,7 @@ export function CreateProjectDialog({ open, onClose, organizations, onSuccess }:
 
       if (result.success) {
         toast({
-          title: "✅ Created!",
+          title: "Created!",
           description: "Project created successfully"
         })
         onSuccess()
@@ -131,14 +132,17 @@ export function CreateProjectDialog({ open, onClose, organizations, onSuccess }:
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {PROJECT_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>
-                    <span className="flex items-center gap-2">
-                      <span>{t.icon}</span>
-                      <span>{t.label}</span>
-                    </span>
-                  </SelectItem>
-                ))}
+                {PROJECT_TYPES.map((t) => {
+                  const Icon = t.icon
+                  return (
+                    <SelectItem key={t.value} value={t.value}>
+                      <span className="flex items-center gap-2">
+                        <Icon className="w-4 h-4" />
+                        <span>{t.label}</span>
+                      </span>
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
           </div>

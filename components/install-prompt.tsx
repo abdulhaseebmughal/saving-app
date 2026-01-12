@@ -73,12 +73,16 @@ export function InstallPrompt() {
     <AnimatePresence>
       {showPrompt && (
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-4 left-4 right-4 z-50 sm:left-auto sm:right-4 sm:w-96"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
         >
-          <Card className="border-primary/50 bg-card p-4 shadow-lg">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={handleDismiss}
+          />
+          <Card className="relative border-primary/50 bg-card p-4 shadow-lg w-full max-w-md">
             <div className="flex items-start gap-3">
               <div className="flex-1 space-y-2">
                 <h3 className="font-semibold">Install SaveIt.AI</h3>
