@@ -1,7 +1,7 @@
-const CACHE_NAME = 'saveit-ai-v6';
-const STATIC_CACHE = 'saveit-ai-static-v6';
-const DYNAMIC_CACHE = 'saveit-ai-dynamic-v6';
-const IMAGE_CACHE = 'saveit-ai-images-v6';
+const CACHE_NAME = 'saveit-ai-v7';
+const STATIC_CACHE = 'saveit-ai-static-v7';
+const DYNAMIC_CACHE = 'saveit-ai-dynamic-v7';
+const IMAGE_CACHE = 'saveit-ai-images-v7';
 
 // Detect development mode
 const isDevelopment = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
@@ -10,8 +10,9 @@ const isDevelopment = self.location.hostname === 'localhost' || self.location.ho
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icon-192.jpg',
-  '/icon-512.jpg'
+  '/icon-192.png',
+  '/icon-512.png',
+  '/favicon.ico'
 ];
 
 // Maximum cache size
@@ -131,7 +132,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         }).catch(() => {
-          return caches.match('/icon-192.jpg').then((fallback) => {
+          return caches.match('/icon-192.png').then((fallback) => {
             return fallback || new Response('', { status: 404 });
           });
         });
@@ -281,8 +282,8 @@ self.addEventListener('push', (event) => {
     const data = event.data.json();
     const options = {
       body: data.body || 'New update available',
-      icon: '/icon-192.jpg',
-      badge: '/icon-192.jpg',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
       vibrate: [200, 100, 200],
       data: {
         url: data.url || '/'

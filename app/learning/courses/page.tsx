@@ -151,7 +151,9 @@ export default function CoursesPage() {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+              <Search className="w-5 h-5 text-muted-foreground" />
+            </div>
             <Input
               placeholder="Search courses..."
               value={searchQuery}
@@ -296,7 +298,9 @@ export default function CoursesPage() {
         ) : (
           <div className="text-center py-20 bg-gradient-to-br from-card to-card/50 border-2 border-dashed border-border rounded-2xl">
             <div className="bg-muted/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-10 h-10 text-muted-foreground" />
+              <div className="flex items-center justify-center w-full h-full">
+                <AlertCircle className="w-10 h-10 text-muted-foreground" />
+              </div>
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-3">No courses found</h3>
             <p className="text-muted-foreground mb-6 text-lg max-w-md mx-auto">

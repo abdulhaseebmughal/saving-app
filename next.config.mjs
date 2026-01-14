@@ -6,8 +6,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Optimize font loading to prevent preload warnings
-  optimizeFonts: true,
   experimental: {
     optimizeCss: true,
   },
@@ -20,13 +18,13 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https: http://localhost:* chrome-extension://* blob:",
-              "script-src-elem 'self' 'unsafe-inline' https: http://localhost:* chrome-extension://* blob:",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https: http://localhost:* blob:",
+              "script-src-elem 'self' 'unsafe-inline' https: http://localhost:* blob:",
               "style-src 'self' 'unsafe-inline' https: http://localhost:* blob:",
               "img-src 'self' data: https: http://localhost:* blob:",
               "font-src 'self' data: https: http://localhost:* blob:",
               "connect-src 'self' http://localhost:* https://saving-app-backend-six.vercel.app https://*.vercel.app https://www.google-analytics.com https://analytics.google.com wss: ws:",
-              "frame-src 'self' https: http://localhost:* chrome-extension://*",
+              "frame-src 'self' https: http://localhost:*",
               "worker-src 'self' blob:",
               "manifest-src 'self'",
             ].join('; ')

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Plus, BookOpen, Code, TrendingUp, Clock, CheckCircle2, Pause, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { renderCourseIcon } from '@/lib/course-icons'
+import { CourseraQuickImport } from '@/components/coursera-quick-import'
 
 export default function LearningDashboard() {
   const router = useRouter()
@@ -92,6 +93,11 @@ export default function LearningDashboard() {
             <h1 className="text-4xl font-bold text-foreground mb-2">Learning Hub</h1>
             <p className="text-muted-foreground">Track your courses, technologies, and learning progress</p>
           </div>
+        </div>
+
+        {/* Coursera Quick Import Section */}
+        <div className="mb-8">
+          <CourseraQuickImport onSuccess={loadData} />
         </div>
 
         {/* Stats Grid */}
@@ -263,7 +269,9 @@ export default function LearningDashboard() {
 
         {courses.length === 0 && (
           <div className="text-center py-12">
-            <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <div className="flex items-center justify-center mb-4">
+              <BookOpen className="w-16 h-16 text-muted-foreground" />
+            </div>
             <h3 className="text-xl font-semibold text-foreground mb-2">No courses yet</h3>
             <p className="text-muted-foreground mb-4">Start your learning journey by creating your first course</p>
             <Button onClick={() => router.push('/learning/courses')}>

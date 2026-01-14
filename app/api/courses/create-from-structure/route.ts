@@ -14,61 +14,66 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { url, userRole, targetSkillLevel } = body
+    const { courseData } = body
 
-    if (!url) {
+    if (!courseData) {
       return NextResponse.json(
-        { success: false, error: "URL is required" },
+        { success: false, error: "Course data is required" },
         { status: 400 }
       )
     }
 
-    let cleanUrl = url.trim()
-    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
-      cleanUrl = 'https://' + cleanUrl
-    }
-
-    try {
-      new URL(cleanUrl)
-    } catch {
+    if (!courseData.courseTitle) {
       return NextResponse.json(
-        { success: false, error: "Invalid URL format" },
+        { success: false, error: "Course title is required" },
         { status: 400 }
       )
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/courses/analyze-url`, {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('📤 Proxying create-from-structure request to backend...')
+      console.log('📊 Course:', courseData.courseTitle)
+      console.log('📦 Modules:', courseData.modules?.length || 0)
+    }
+
+    const response = await fetch(`${BACKEND_URL}/api/courses/create-from-structure`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': authHeader,
       },
-      body: JSON.stringify({
-        url: cleanUrl,
-        userRole: userRole || 'beginner',
-        targetSkillLevel: targetSkillLevel || ''
-      }),
+      body: JSON.stringify({ courseData }),
     })
 
     const data = await response.json()
 
     if (!response.ok) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('❌ Backend error:', data)
+      }
       return NextResponse.json(
         {
           success: false,
-          error: data.error || 'Failed to analyze URL',
-          details: data.details || 'The backend server could not process this URL'
+          error: data.error || 'Failed to create course',
+          details: data.details || 'The backend server could not create this course'
         },
         { status: response.status }
       )
     }
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ Course created successfully:', data.data?.course?._id)
+    }
+
     return NextResponse.json(data)
   } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("❌ Error creating course from structure:", error)
+    }
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to analyze URL",
+        error: "Failed to create course from structure",
         details: error instanceof Error ? error.message : "An unexpected error occurred"
       },
       { status: 500 }
