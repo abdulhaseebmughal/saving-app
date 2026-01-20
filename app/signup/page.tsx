@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Sparkles, Mail, Lock, User, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
@@ -63,7 +62,7 @@ export default function SignupPage() {
       await signup(name, email, password)
       setStep('otp')
       toast({
-        title: "OTP Sent!",
+        title: "OTP Sent",
         description: "Check your email for the 6-digit OTP code",
         duration: 5000
       })
@@ -96,7 +95,7 @@ export default function SignupPage() {
     try {
       await verifySignup(email, otp)
       toast({
-        title: "Success!",
+        title: "Success",
         description: "Account created successfully. Redirecting...",
       })
     } catch (error: any) {
@@ -116,7 +115,7 @@ export default function SignupPage() {
     try {
       await signup(name, email, password)
       toast({
-        title: "OTP Resent!",
+        title: "OTP Resent",
         description: "Check your email for a new OTP code",
       })
     } catch (error: any) {
@@ -131,28 +130,26 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="bg-card border border-border rounded-lg p-8 shadow-lg">
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-                <Sparkles className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <h1 className="text-3xl font-bold text-foreground">SaveIt.AI</h1>
-            </div>
+        <div style={{borderRadius: '5px'}} className="bg-white border border-[#e5e5e5] p-8 shadow-lg">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-[#1a1a1a] mb-1">SaveIt.AI</h1>
+            <p className="text-sm text-[#666666]">
+              {step === 'details' ? 'Create Account' : 'SaveIt.AI Authentication'}
+            </p>
           </div>
 
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-foreground mb-2">
+            <h2 className="text-xl font-semibold text-[#1a1a1a] mb-2">
               {step === 'details' ? 'Create Account' : 'Verify Email'}
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#666666]">
               {step === 'details'
                 ? 'Sign up to start saving your knowledge'
                 : `Enter the OTP sent to ${email}`}
@@ -162,71 +159,59 @@ export default function SignupPage() {
           {step === 'details' && (
             <form onSubmit={handleSignup} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-[#1a1a1a] mb-2">
                   Name
                 </label>
-                <div className="relative flex items-center">
-                  <User className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="pl-10 h-10"
-                    disabled={isLoading}
-                    autoFocus
-                  />
-                </div>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-11"
+                  disabled={isLoading}
+                  autoFocus
+                />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-[#1a1a1a] mb-2">
                   Email
                 </label>
-                <div className="relative flex items-center">
-                  <Mail className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-10"
-                    disabled={isLoading}
-                  />
-                </div>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-11"
+                  disabled={isLoading}
+                />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-[#1a1a1a] mb-2">
                   Password
                 </label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="At least 6 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-10"
-                    disabled={isLoading}
-                  />
-                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="At least 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-11"
+                  disabled={isLoading}
+                />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full h-11" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Creating Account...</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <span>Sign Up</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
+                  "Sign Up"
                 )}
               </Button>
             </form>
@@ -234,33 +219,36 @@ export default function SignupPage() {
 
           {step === 'otp' && (
             <form onSubmit={handleVerifyOTP} className="space-y-4">
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
-                <p className="text-sm text-blue-400 text-center">
+              <div style={{borderRadius: '5px'}} className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 mb-4">
+                <p className="text-sm text-[#1a1a1a] text-center">
                   Check your email for the 6-digit OTP code
                 </p>
               </div>
 
               <div>
-                <label htmlFor="otp" className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="otp" className="block text-sm font-medium text-[#1a1a1a] mb-2">
                   OTP Code
                 </label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    id="otp"
-                    type="text"
-                    placeholder="Enter 6-digit OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="pl-10 text-center text-lg tracking-widest h-12"
-                    disabled={isLoading}
-                    autoFocus
-                    maxLength={6}
-                  />
-                </div>
+                <Input
+                  id="otp"
+                  type="text"
+                  placeholder="Enter 6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="text-center text-lg tracking-widest h-12"
+                  disabled={isLoading}
+                  autoFocus
+                  maxLength={6}
+                />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading || otp.length !== 6}>
+              <div style={{borderRadius: '5px'}} className="bg-[#f5f5f5] border border-[#e5e5e5] p-3">
+                <p className="text-xs text-[#666666] text-center">
+                  Valid for 10 minutes
+                </p>
+              </div>
+
+              <Button type="submit" className="w-full h-11" disabled={isLoading || otp.length !== 6}>
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -275,7 +263,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setStep('details')}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-[#666666] hover:text-[#1a1a1a] transition-colors"
                   disabled={isLoading}
                 >
                   Change Details
@@ -283,7 +271,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={handleResendOTP}
-                  className="text-primary hover:text-primary/80 transition-colors font-medium"
+                  className="text-[#1a1a1a] hover:text-[#666666] transition-colors font-medium"
                   disabled={isLoading}
                 >
                   Resend OTP
@@ -294,25 +282,37 @@ export default function SignupPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="w-full border-t border-[#e5e5e5]"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">or</span>
+              <span className="bg-white px-2 text-[#666666]">or</span>
             </div>
           </div>
 
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#666666]">
               Already have an account?{' '}
-              <Link href="/login" className="text-primary hover:text-primary/80 font-medium">
+              <Link href="/login" className="text-[#1a1a1a] hover:text-[#666666] font-medium">
                 Login
               </Link>
             </p>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-xs text-muted-foreground">
-              SaveIt.AI - Your personal knowledge management system
+          <div style={{borderRadius: '5px'}} className="mt-6 bg-[#f5f5f5] border border-[#e5e5e5] p-3">
+            <p className="text-xs text-[#666666] text-center">
+              Security Notice
+            </p>
+            <p className="text-xs text-[#666666] text-center mt-1">
+              Never share this OTP with anyone. SaveIt.AI staff will never ask for your OTP.
+            </p>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-xs text-[#666666]">
+              This is an automated message from SaveIt.AI
+            </p>
+            <p className="text-xs text-[#666666] mt-1">
+              Your personal knowledge management system
             </p>
           </div>
         </div>

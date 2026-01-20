@@ -2,12 +2,14 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
-import { Navbar } from "@/components/navbar"
+import { Sidebar } from "@/components/sidebar"
+import { MobileHeader } from "@/components/mobile-header"
 import { PWARegister } from "@/components/pwa-register"
 import { AuthProvider } from "@/contexts/auth-context"
+import { SidebarProvider } from "@/contexts/sidebar-context"
 import { AuthGuard } from "@/components/auth-guard"
-import { AdminShortcut } from "@/components/admin-shortcut"
 import { Toaster } from "@/components/ui/toaster"
+import { MainContent } from "@/components/main-content"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -85,12 +87,16 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <PWARegister />
         <AuthProvider>
-          <AdminShortcut />
-          <AuthGuard>
-            <Navbar />
-            <main className="min-h-screen bg-background">{children}</main>
-          </AuthGuard>
-          <Toaster />
+          <SidebarProvider>
+            <AuthGuard>
+              <Sidebar />
+              <MobileHeader />
+              <MainContent>
+                {children}
+              </MainContent>
+            </AuthGuard>
+            <Toaster />
+          </SidebarProvider>
         </AuthProvider>
       </body>
     </html>
