@@ -113,62 +113,55 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-[#0a0a0a] grid place-items-center p-4 sm:p-6 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-[90%] sm:max-w-[24rem] my-auto"
       >
-        <div style={{borderRadius: '5px'}} className="bg-white border border-[#e5e5e5] p-8 shadow-lg">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#1a1a1a] mb-1">SaveIt.AI</h1>
-            <p className="text-sm text-[#666666]">
-              {step === 'email' ? 'Login Verification' : 'SaveIt.AI Authentication'}
-            </p>
+        <div className="bg-[#111111] border border-[#222222] rounded-2xl p-5 sm:p-7">
+          <div className="flex items-center justify-center gap-2.5 mb-6">
+            <img src="/sav-icon.png" alt="SaveIt.AI" className="w-8 h-8 rounded-lg" />
+            <h1 className="text-xl font-semibold text-white">SaveIt.AI</h1>
           </div>
 
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-semibold text-[#1a1a1a] mb-2">
+          <div className="text-center mb-5">
+            <h2 className="text-lg font-medium text-white mb-1">
               {step === 'email' ? 'Welcome Back' : 'Enter OTP'}
             </h2>
-            <p className="text-sm text-[#666666]">
-              {step === 'email'
-                ? 'Enter your email to receive an OTP'
-                : `Enter the OTP sent to ${email}`}
+            <p className="text-sm text-gray-400">
+              {step === 'email' ? 'Enter your email to receive an OTP' : `Code sent to ${email}`}
             </p>
           </div>
 
           {step === 'email' && (
             <form onSubmit={handleRequestOTP} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#1a1a1a] mb-2">
-                  Email
-                </label>
+                <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-11"
+                  className="h-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 focus:border-[#3a3a3a] focus:ring-0"
                   disabled={isLoading}
                   autoFocus
                 />
               </div>
-
               <Button
                 type="submit"
-                className="w-full h-11"
+                className="w-full h-10 bg-white hover:bg-gray-100 text-black font-medium flex items-center justify-center gap-2"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Sending OTP...</span>
-                  </div>
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    Sending...
+                  </>
                 ) : (
-                  "Continue"
+                  <>Continue <span>→</span></>
                 )}
               </Button>
             </form>
@@ -176,120 +169,53 @@ export default function LoginPage() {
 
           {step === 'otp' && (
             <form onSubmit={handleVerifyOTP} className="space-y-4">
-              <div style={{borderRadius: '5px'}} className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 mb-4">
-                <p className="text-sm text-[#1a1a1a] text-center">
-                  Check your email for the 6-digit OTP code
-                </p>
-              </div>
-
               <div>
-                <label htmlFor="otp" className="block text-sm font-medium text-[#1a1a1a] mb-2">
-                  OTP Code
-                </label>
+                <label htmlFor="otp" className="block text-xs font-medium text-gray-400 mb-1.5">OTP Code</label>
                 <Input
                   id="otp"
                   type="text"
-                  placeholder="Enter 6-digit OTP"
+                  placeholder="000000"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="text-center text-lg tracking-widest h-12"
+                  className="text-center text-lg tracking-[0.3em] h-11 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 focus:border-[#3a3a3a] focus:ring-0"
                   disabled={isLoading}
                   autoFocus
                   maxLength={6}
                 />
+                <p className="text-xs text-gray-500 text-center mt-1.5">Valid for 10 minutes</p>
               </div>
-
-              <div style={{borderRadius: '5px'}} className="bg-[#f5f5f5] border border-[#e5e5e5] p-3">
-                <p className="text-xs text-[#666666] text-center">
-                  Valid for 10 minutes
-                </p>
-              </div>
-
               <Button
                 type="submit"
-                className="w-full h-11"
+                className="w-full h-10 bg-white hover:bg-gray-100 text-black font-medium"
                 disabled={isLoading || otp.length !== 6}
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Verifying...</span>
-                  </div>
-                ) : (
-                  "Verify & Login"
-                )}
+                  <><div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" />Verifying...</>
+                ) : "Verify & Login"}
               </Button>
-
-              <div className="flex items-center justify-between text-sm">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep('email')
-                    setOtp("")
-                  }}
-                  className="text-[#666666] hover:text-[#1a1a1a] transition-colors"
-                  disabled={isLoading}
-                >
-                  Change Email
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResendOTP}
-                  className="text-[#1a1a1a] hover:text-[#666666] transition-colors font-medium"
-                  disabled={isLoading}
-                >
-                  Resend OTP
-                </button>
+              <div className="flex justify-between text-xs">
+                <button type="button" onClick={() => { setStep('email'); setOtp("") }} className="text-gray-500 hover:text-white" disabled={isLoading}>Change Email</button>
+                <button type="button" onClick={handleResendOTP} className="text-gray-300 hover:text-white font-medium" disabled={isLoading}>Resend</button>
               </div>
             </form>
           )}
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#e5e5e5]"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-[#666666]">or</span>
-            </div>
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#222]" /></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-[#111111] px-2 text-gray-600">or</span></div>
           </div>
 
-          <div className="text-center">
-            <p className="text-sm text-[#666666]">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-[#1a1a1a] hover:text-[#666666] font-medium">
-                Sign up
-              </Link>
-            </p>
-          </div>
+          <p className="text-center text-sm text-gray-400">
+            Don't have an account? <Link href="/signup" className="text-white hover:text-gray-300">Sign up</Link>
+          </p>
 
           {step === 'email' && (
-            <div className="text-center mt-4">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-[#666666] hover:text-[#1a1a1a] transition-colors"
-              >
-                Forgot your password?
-              </Link>
-            </div>
+            <p className="text-center text-xs text-gray-500 mt-3">
+              <Link href="/forgot-password" className="hover:text-gray-300">Forgot password?</Link>
+            </p>
           )}
 
-          <div style={{borderRadius: '5px'}} className="mt-6 bg-[#f5f5f5] border border-[#e5e5e5] p-3">
-            <p className="text-xs text-[#666666] text-center">
-              Security Notice
-            </p>
-            <p className="text-xs text-[#666666] text-center mt-1">
-              Never share this OTP with anyone. SaveIt.AI staff will never ask for your OTP.
-            </p>
-          </div>
-
-          <div className="mt-6 text-center">
-            <p className="text-xs text-[#666666]">
-              This is an automated message from SaveIt.AI
-            </p>
-            <p className="text-xs text-[#666666] mt-1">
-              Your personal knowledge management system
-            </p>
-          </div>
+          <p className="text-center text-xs text-gray-600 mt-6">SaveIt.AI · Your knowledge system</p>
         </div>
       </motion.div>
     </div>
