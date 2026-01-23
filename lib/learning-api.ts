@@ -1,6 +1,6 @@
 import { getAuthHeaders } from './auth-headers';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api';
 
 // Course API
 export const getCourses = async (status?: string, category?: string) => {

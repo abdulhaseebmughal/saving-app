@@ -17,7 +17,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     // Load saved settings from localStorage
-    const savedBackendUrl = localStorage.getItem("backend_url") || "http://localhost:5000/api"
+    const savedBackendUrl = localStorage.getItem("backend_url") || "https://saving-app-backend-six.vercel.app/api"
     const savedGeminiKey = localStorage.getItem("gemini_api_key") || ""
     setBackendUrl(savedBackendUrl)
     setGeminiApiKey(savedGeminiKey)
@@ -68,7 +68,7 @@ export default function SettingsPage() {
               <Input
                 id="backend-url"
                 type="text"
-                placeholder="http://localhost:5000/api"
+                placeholder="https://saving-app-backend-six.vercel.app/api"
                 value={backendUrl}
                 onChange={(e) => setBackendUrl(e.target.value)}
               />

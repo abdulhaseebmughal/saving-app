@@ -3,7 +3,7 @@
  */
 
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://saving-app-backend-six.vercel.app/api',
   TIMEOUT: 30000,
 } as const
 

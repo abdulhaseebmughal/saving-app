@@ -1,22 +1,35 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+const BACKEND_URL = process.env.BACKEND_URL || 'https://saving-app-backend-six.vercel.app'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
     const { id } = await params
     const response = await fetch(`${BACKEND_URL}/api/item/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authHeader,
       },
     })
 
     if (!response.ok) {
-      throw new Error('Failed to fetch item from backend')
+      const errorData = await response.json().catch(() => ({}))
+      return NextResponse.json(
+        { success: false, error: errorData.error || 'Failed to fetch item' },
+        { status: response.status }
+      )
     }
 
     const data = await response.json()
@@ -35,6 +48,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
     const { id } = await params
     const body = await request.json()
 
@@ -42,12 +63,17 @@ export async function PUT(
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authHeader,
       },
       body: JSON.stringify(body),
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update item in backend')
+      const errorData = await response.json().catch(() => ({}))
+      return NextResponse.json(
+        { success: false, error: errorData.error || 'Failed to update item' },
+        { status: response.status }
+      )
     }
 
     const data = await response.json()
@@ -66,16 +92,29 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
     const { id } = await params
     const response = await fetch(`${BACKEND_URL}/api/item/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authHeader,
       },
     })
 
     if (!response.ok) {
-      throw new Error('Failed to delete item from backend')
+      const errorData = await response.json().catch(() => ({}))
+      return NextResponse.json(
+        { success: false, error: errorData.error || 'Failed to delete item' },
+        { status: response.status }
+      )
     }
 
     const data = await response.json()

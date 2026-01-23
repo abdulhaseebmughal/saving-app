@@ -16,8 +16,14 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (but keep .env.example)
-.env*
+# env files
+.env
+.env.local
+.env.local.development
+.env*.local
+
+# Keep production env (contains only public URLs, no secrets)
+!.env.production
 !.env.example
 
 # vercel
@@ -26,6 +32,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# local env
-.env.local
