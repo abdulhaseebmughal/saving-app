@@ -1,6 +1,6 @@
 /**
- * Next.js Middleware for Authentication
- * Runs on the edge before page renders
+ * Next.js Proxy for Authentication & Routing
+ * Runs on Node.js runtime before page renders
  */
 
 import { NextResponse } from 'next/server'
@@ -33,7 +33,7 @@ const PROTECTED_ROUTES = [
 // Admin route
 const ADMIN_ROUTE = '/admin'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Allow public routes
@@ -72,12 +72,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
